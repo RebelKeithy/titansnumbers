@@ -43,6 +43,8 @@
 				chestGold: 0,
 				tapDPS: 0
 			}
+			
+			// cost field is never used and should be remove
 			var heros = [
 				{name:"Takeda the Blade Assassin", level:"0", dps:4, cost:"50", skillType:["heroDamage", "heroDamage", "allDamage", "criticalDamage", "heroDamage", "allDamage", "heroDamage"], skillValue:[0.5, 1, 0.1, 0.1, 10, 0.25, 100], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Contessa the Torch Wielder", level:"0", dps:16, cost:"175", skillType:["tapDamage", "heroDamage", "heroDamage", "tapDPS", "allDamage", "goldAmount", "heroDamage"], skillValue:[0.05, 1, 10, 0.004, 0.1, 0.1, 100], skillBought:[false, false, false, false, false, false, false]},
@@ -62,7 +64,6 @@
 				{name:"Poppy, Daughter of Ceremony", level:"0", dps:76.51E+9, cost:"164E+12", skillType:["heroDamage", "chestGold", "goldAmount", "bossDamage", "bossDamage", "allDamage", "allDamage"], skillValue:[3.5, 0.25, 0.2, 0.05, 0.07, 0.15, 0.2], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Skulptor, Protector of Bridges", level:"0", dps:547.07E+9, cost:"1.64E+15", skillType:["heroDamage", "heroDamage", "goldAmount", "goldAmount", "tapDamage", "criticalDamage", "goldAmount"], skillValue:[1.5, 9, 0.1, 0.1, 0.05, 0.1, 0.25], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Sterling the Enchantor", level:"0", dps:391.16E+9, cost:"49.2E+15", skillType:["heroDamage", "heroDamage", "bossDamage", "heroDamage", "tapDamage", "chestGold", "allDamage"], skillValue:[4, 5, 0.05, 4.5, 0.05, 0.2, 0.15], skillBought:[false, false, false, false, false, false, false]},
-				//new
 				{name:"Orba the Foreseer", level:"0", dps:391.16E+9, cost:"2.46E+18", skillType:["heroDamage", "heroDamage", "tapDPS", "tapDamage", "allDamage", "goldAmount", "allDamage"], skillValue:[2, 10, 0.005, 0.05, 0.1, 0.1, 0.1], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Remus the Noble Archer", level:"0", dps:391.16E+9, cost:"73.8E+18", skillType:["heroDamage", "heroDamage", "criticalDamage", "heroDamage", "tapDPS", "tapDamage", "goldAmount"], skillValue:[2.5, 6, 0.2, 4.5, 0.004, 0.1, 0.1], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Mikey the Magician Apprentice", level:"0", dps:391.16E+9, cost:"2.44E+21", skillType:["heroDamage", "tapDamage", "allDamage", "criticalChance", "allDamage", "chestGold", "heroDamage"], skillValue:[2, 0.05, 0.3, 0.02, 0.1, 0.2, 100], skillBought:[false, false, false, false, false, false, false]},
@@ -73,7 +74,8 @@
 				{name:"Eistor the Banisher", level:"0", dps:391.16E+9, cost:"2.36E+36", skillType:["heroDamage", "heroDamage", "tapDPS", "bossDamage", "allDamage", "bossDamage", "goldAmount"], skillValue:[3.5, 6.5, 0.004, 0.5, 0.1, 0.05, 0.12], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Flavius and Oinksbjorn", level:"0", dps:391.16E+9, cost:"25.9E+45", skillType:["heroDamage", "heroDamage", "allDamage", "bossDamage", "criticalChance", "criticalDamage", "chestGold"], skillValue:[3, 7, 0.1, 0.1, 0.02, 0.3, 0.2], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Chester the Beast Tamer", level:"0", dps:391.16E+9, cost:"28.5E+60", skillType:["heroDamage", "allDamage", "heroDamage", "heroDamage", "criticalDamage", "criticalChance", "allDamage"], skillValue:[3.5, 0.01, 4, 6, 0.2, 0.03, 0.15], skillBought:[false, false, false, false, false, false, false]},
-				{name:"Mohacas the Wind Warrior", level:"0", dps:391.16E+9, cost:"3.14E+81", skillType:["heroDamage", "heroDamage", "goldAmount", "tapDamage", "goldAmount", "allDamage", "goldAmount"], skillValue:[3.3, 5.5, 0.1, 0.1, 0.2, 0.1, 0.3], skillBought:[false, false, false, false, false, false, false]}
+				{name:"Mohacas the Wind Warrior", level:"0", dps:391.16E+9, cost:"3.14E+81", skillType:["heroDamage", "heroDamage", "goldAmount", "tapDamage", "goldAmount", "allDamage", "goldAmount"], skillValue:[3.3, 5.5, 0.1, 0.1, 0.2, 0.1, 0.3], skillBought:[false, false, false, false, false, false, false]},
+				{name:"Jaqulin the Unknown", level:"0", dps:391.16E+9, cost:"3.76E+111", skillType:["criticalDamage", "tapDamage", "tapDPS", "goldAmound", "allDamage", "allDamage", "allDamage"], skillValue:[0.4, 0.2, 0.01, 0.6, 0.2, 0.3, 0.4], skillBought:[false, false, false, false, false, false, false]}
 			];
 			var amulets = {
 				"valrunes": {name:"Amulet of the Valrunes", level:"0", maxLevel:-1, baseDamage:0.5, incrementDamage:0.25}, // Implemented
