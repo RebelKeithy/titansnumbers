@@ -138,8 +138,10 @@
 					var cookie = $.cookie("hero" + i).split("!");
 					heros[i].level = cookie[0];
 
-					if(level > cookie[0])
+					if(heros[i].level > 0)
 						$("#hero" + i).val(heros[i].level);
+					else
+						$("#hero" + i).val(0);
 
 					for(var j = 0; j < 7; j++)
 					{
