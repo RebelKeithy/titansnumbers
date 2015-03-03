@@ -204,6 +204,7 @@
 									document.write("</tr>");
 								}
 							</script>
+							<td><input type="button" value="Reset Artifacts" onclick="resetArtifacts()">	
 						</table><br>
 					</div>
 				</td>
@@ -224,7 +225,8 @@
 									document.write("</td><td id=\"hero" + i + "dps\">Hero DPS: </td>");
 									document.write("</tr>");
 								}
-							</script>	
+							</script>
+							<td><input type="button" value="Reset Heros" onclick="resetHeros()">	
 						</table>
 					</div>
 				</td>
@@ -430,6 +432,24 @@
 		updateTitans();
 	}
 
+	function resetHeros()
+	{
+		for(var i = 0; i < heros.length; i++)
+		{
+			var hlabel = "#hero" + i;
+			heros[i].level = 0;
+			$(hlabel).val(0);
+			
+			for(var j = 0; j < 7; j++)
+			{
+				var skillEnabled = $(hlabel + "skill" + j).prop('checked', false);
+				heroSkills[heros[i].skillType[j]] = 0;
+			}
+		}
+		
+		updateTitans();
+	}
+
 	function updateStage()
 	{
 		stageValues.stage = $("#stage").val();
@@ -458,10 +478,27 @@
 				setText(key + "damage", Math.round(currDamage*100) + "%");
 				//alert($("#" + key + "damage"))
 			}
+			else
+			{
+				setText(key + "damage", "0%");
+			}
 		}
 
 		amuletDamage *= 1 + 0.05 * amulets["tincture"].level;
 		
+		updateTitans();
+	}
+
+	function resetArtifacts()
+	{
+		amuletDamage = 0;
+		for(var key in amulets)
+		{
+			amulets[key].level = 0;
+			$("#" + key).val(0);
+			setText(key + "damage", "0%");
+		}
+
 		updateTitans();
 	}
 	
