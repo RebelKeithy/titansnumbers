@@ -62,7 +62,6 @@
 				{name:"Poppy, Daughter of Ceremony", level:"0", dps:76.51E+9, cost:"164E+12", skillType:["heroDamage", "chestGold", "goldAmount", "bossDamage", "bossDamage", "allDamage", "allDamage"], skillValue:[3.5, 0.25, 0.2, 0.05, 0.07, 0.15, 0.2]},
 				{name:"Skulptor, Protector of Bridges", level:"0", dps:547.07E+9, cost:"1.64E+15", skillType:["heroDamage", "heroDamage", "goldAmount", "goldAmount", "tapDamage", "criticalDamage", "goldAmount"], skillValue:[1.5, 9, 0.1, 0.1, 0.05, 0.1, 0.25]},
 				{name:"Sterling the Enchantor", level:"0", dps:391.16E+9, cost:"49.2E+15", skillType:["heroDamage", "heroDamage", "bossDamage", "heroDamage", "tapDamage", "chestGold", "allDamage"], skillValue:[4, 5, 0.05, 4.5, 0.05, 0.2, 0.15]},
-				//new
 				{name:"Orba the Foreseer", level:"0", dps:391.16E+9, cost:"2.46E+18", skillType:["heroDamage", "heroDamage", "tapDPS", "tapDamage", "allDamage", "goldAmount", "allDamage"], skillValue:[2, 10, 0.005, 0.05, 0.1, 0.1, 0.1]},
 				{name:"Remus the Noble Archer", level:"0", dps:391.16E+9, cost:"73.8E+18", skillType:["heroDamage", "heroDamage", "criticalDamage", "heroDamage", "tapDPS", "tapDamage", "goldAmount"], skillValue:[2.5, 6, 0.2, 4.5, 0.004, 0.1, 0.1]},
 				{name:"Mikey the Magician Apprentice", level:"0", dps:391.16E+9, cost:"2.44E+21", skillType:["heroDamage", "tapDamage", "allDamage", "criticalChance", "allDamage", "chestGold", "heroDamage"], skillValue:[2, 0.05, 0.3, 0.02, 0.1, 0.2, 100]},
@@ -109,11 +108,9 @@
 
 			function saveCookie()
 			{
-				console.log("saving cookie")
 				for(var i = 0; i < heros.length; i++)
 				{
 					var cookie = heros[i].level + "!";
-					//$.cookie("hero" + i, heros[i].level);
 
 					for(var j = 0; j < 7; j++)
 					{
@@ -121,7 +118,6 @@
 							cookie += "1";
 						else
 							cookie += "0";
-						//$.cookie("hero" + i + "skill" + j, $("#hero" + i + "skill" + j).prop('checked'));
 					}
 					$.cookie("hero" + i, cookie);
 				}
@@ -136,7 +132,6 @@
 
 			function loadCookie()
 			{
-				console.log("loading cookie");
 				for(var i = 0; i < heros.length; i++)
 				{
 					var cookie = $.cookie("hero" + i).split("!");
@@ -185,7 +180,7 @@
 	<p id="tcriticalmultiplier">Critical Multiplier: 10</p>
 	<p id="tcriticaldamage">Critical Damage: 0</p>
 	<p id="tcriticalchance">Critical Chance: 2%</p>
-	<p id="ttapdps">Tap DPS (at 7 tps): 0</p>
+	<p id="ttapdps">Tap DPS (at 10 tps): 0</p>
 	<p id="tsecondstokillboss">Seconds to Kill Boss: 0 </p>
 
 	<br>
@@ -537,7 +532,7 @@
 		setText("tcriticalmultiplier", "Critical Multiplier: " + gameValues.criticalMultiplier);
 		setText("tcriticaldamage", "Critical Damage: " + formatNumber(gameValues.criticalDamage));
 		setText("tcriticalchance", "Critical Chance: " + gameValues.criticalChance*100 + "%");
-		setText("ttapdps", "Tap DPS (at 7 tps): " + formatNumber(gameValues.tapDPS));
+		setText("ttapdps", "Tap DPS (at 10 tps): " + formatNumber(gameValues.tapDPS));
 		console.log()
 		setText("tsecondstokillboss", "Seconds to Kill Boss:" + (stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))).toFixed(2));
 	}
