@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Tap Titans Calc</title>
+		<title>Tap Titans Optimizer</title>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 		<script src="http://rebelkeithy.github.io/titansnumbers/jcookies/jquery.cookie.js"></script>
 		<script>
@@ -137,7 +137,9 @@
 				{
 					var cookie = $.cookie("hero" + i).split("!");
 					heros[i].level = cookie[0];
-					$("#hero" + i).val(heros[i].level);
+
+					if(level > cookie[0])
+						$("#hero" + i).val(heros[i].level);
 
 					for(var j = 0; j < 7; j++)
 					{
@@ -170,7 +172,7 @@
 		</script>
 	</head>
 	<script>loadCookie()</script>
-	<h2><p id="r2">Tap Tap Titans Calculator</p></h2>
+	<h2><p id="r2">Tap Titans Optimizer</p></h2>
 	<p id="tstage">Stage: 0</p>
 	<p id="tmobhealth">Mob Health: 0</p>
 	<p id="tbosshealth">Boss Health: 0</p>
