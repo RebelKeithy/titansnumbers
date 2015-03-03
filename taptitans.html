@@ -1,0 +1,581 @@
+<html>
+	<head>
+		<title>Tap Titans Calc</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="/jcookies/jquery.cookie.js"></script>
+		<script>
+			var amuletDamage = 0;
+			var bossMultiplier = [2, 4, 6, 7, 10];
+			var skillAtLevel = [10, 25, 50, 100, 200, 400, 800];
+
+			var stageValues = {
+				stage: 1,
+				mobHealth: 30,
+				mobGold: 1,
+				bossHealth: 60,
+				bossGold: 1,
+				chestChance: 0.02,
+				chestGold: 10
+			}
+			var gameValues = {
+				heroLevel: 1,
+				heroNextLevelCost: 1,
+				criticalDamage: 1,
+				criticalMultiplier: 10,
+				criticalChance: 0.01,
+				tapDamage: 1,
+				tapDPS: 7,
+				heroDamage: 0,
+				heavenlyStrike: 0,
+				shadowClone: 0,
+				criticalStrike: 0,
+				warCry: 0,
+				handOfMidas: 0
+			}
+			var heroSkills = {
+				heroDamage: 0,
+				allDamage: 0,
+				tapDamage: 0,
+				bossDamage: 0,
+				criticalDamage: 0,
+				criticalChance: 0,
+				goldAmount: 0,
+				chestGold: 0,
+				tapDPS: 0
+			}
+			var heros = [
+				{name:"Takeda the Blade Assassin", level:"0", dps:4, cost:"50", skillType:["heroDamage", "heroDamage", "allDamage", "criticalDamage", "heroDamage", "allDamage", "heroDamage"], skillValue:[0.5, 1, 0.1, 0.1, 10, 0.25, 100]},
+				{name:"Contessa the Torch Wielder", level:"0", dps:16, cost:"175", skillType:["tapDamage", "heroDamage", "heroDamage", "tapDPS", "allDamage", "goldAmount", "heroDamage"], skillValue:[0.05, 1, 10, 0.004, 0.1, 0.1, 100]},
+				{name:"Hornetta, Queen of the Valrunes", level:"0", dps:56, cost:"674", skillType:["heroDamage", "goldAmount", "allDamage", "tapDPS", "chestGold", "criticalChance", "allDamage"], skillValue:[1.5, 0.1, 0.1, 0.004, 0.2, 0.01, 0.3]},
+				{name:"Mila the Hammer Stomper", level:"0", dps:188, cost:"2.58E+3", skillType:["heroDamage", "heroDamage", "goldAmount", "heroDamage", "criticalDamage", "allDamage", "chestGold"], skillValue:[1, 8, 0.06, 5, 0.05, 0.2, 0.2]},
+				{name:"Terra the Land Scorcher", level:"0", dps:807, cost:"13.3E+3", skillType:["heroDamage", "goldAmount", "tapDPS", "goldAmount", "chestGold", "tapDamage", "heroDamage"], skillValue:[3, 0.1, 0.004, 0.15, 0.2, 0.05, 100]},
+				{name:"Inquisireaux the Terrible", level:"0", dps:3.29E+3, cost:"68.1E+3", skillType:["heroDamage", "heroDamage", "allDamage", "allDamage", "criticalDamage", "criticalChance", "heroDamage"], skillValue:[2, 7, 0.1, 0.2, 0.05, 0.02, 100]},
+				{name:"Charlotte the Special", level:"0", dps:14.14E+3, cost:"384E+3", skillType:["heroDamage", "bossDamage", "bossDamage", "heroDamage", "tapDamage", "chestGold", "allDamage"], skillValue:[2, 0.05, 0.07, 6, 0.05, 0.2, 0.3]},
+				{name:"Jordaan, Knight of Mini", level:"0", dps:63.64E+3, cost:"2.36E+6", skillType:["heroDamage", "allDamage", "tapDPS", "goldAmount", "chestGold", "heroDamage", "allDamage"], skillValue:[2, 0.1, 0.004, 0.15, 0.2, 19, 0.2]},
+				{name:"Jukka, Master of Axes", level:"0", dps:440.12E+3, cost:"23.8E+6", skillType:["heroDamage", "bossDamage", "allDamage", "criticalDamage", "heroDamage", "allDamage", "heroDamage"], skillValue:[1.5, 0.05, 0.3, 0.05, 50, 0.25, 100]},
+				{name:"Milo and Clonk-Clonk", level:"0", dps:1.74E+6, cost:"143E+6", skillType:["heroDamage", "criticalChance", "bossDamage", "goldAmount", "chestGold", "chestGold", "allDamage"], skillValue:[1.5, 0.01, 0.05, 0.15, 0.2, 0.25, 0.15]},
+				{name:"Macelord the Ruthless", level:"0", dps:7.15E+6, cost:"943E+6", skillType:["heroDamage", "heroDamage", "tapDamage", "tapDPS", "goldAmount", "criticalChance", "heroDamage"], skillValue:[2, 8.5, 0.05, 0.004, 0.15, 0.01, 38]},
+				{name:"Gertrude the Goat Rider", level:"0", dps:30.65E+6, cost:"6.84E+9", skillType:["heroDamage", "heroDamage", "bossDamage", "criticalDamage", "tapDPS", "tapDamage", "goldAmount"], skillValue:[2.5, 13, 0.07, 0.05, 0.004, 0.05, 0.2]},
+				{name:"Twitterella the Tweeter", level:"0", dps:136.87E+6, cost:"54.7E+9", skillType:["heroDamage", "heroDamage", "tapDamage", "allDamage", "allDamage", "criticalDamage", "heroDamage"], skillValue:[1.5, 8.5, 0.05, 0.2, 0.3, 0.05, 120]},
+				{name:"Master Hawk, Lord of Luft", level:"0", dps:1.08E+9, cost:"820E+9", skillType:["heroDamage", "heroDamage", "tapDPS", "heroDamage", "goldAmount", "criticalDamage", "goldAmount"], skillValue:[2, 11, 0.004, 4, 0.1, 0.1, 0.2]},
+				{name:"Elpha, Wielder of Gems", level:"0", dps:5.35E+9, cost:"8.2E+12", skillType:["heroDamage", "allDamage", "bossDamage", "criticalChance", "criticalDamage", "chestGold", "heroDamage"], skillValue:[3, 0.4, 0.05, 0.02, 0.15, 0.2, 100]},
+				{name:"Poppy, Daughter of Ceremony", level:"0", dps:76.51E+9, cost:"164E+12", skillType:["heroDamage", "chestGold", "goldAmount", "bossDamage", "bossDamage", "allDamage", "allDamage"], skillValue:[3.5, 0.25, 0.2, 0.05, 0.07, 0.15, 0.2]},
+				{name:"Skulptor, Protector of Bridges", level:"0", dps:547.07E+9, cost:"1.64E+15", skillType:["heroDamage", "heroDamage", "goldAmount", "goldAmount", "tapDamage", "criticalDamage", "goldAmount"], skillValue:[1.5, 9, 0.1, 0.1, 0.05, 0.1, 0.25]},
+				{name:"Sterling the Enchantor", level:"0", dps:391.16E+9, cost:"49.2E+15", skillType:["heroDamage", "heroDamage", "bossDamage", "heroDamage", "tapDamage", "chestGold", "allDamage"], skillValue:[4, 5, 0.05, 4.5, 0.05, 0.2, 0.15]},
+				//new
+				{name:"Orba the Foreseer", level:"0", dps:391.16E+9, cost:"2.46E+18", skillType:["heroDamage", "heroDamage", "tapDPS", "tapDamage", "allDamage", "goldAmount", "allDamage"], skillValue:[2, 10, 0.005, 0.05, 0.1, 0.1, 0.1]},
+				{name:"Remus the Noble Archer", level:"0", dps:391.16E+9, cost:"73.8E+18", skillType:["heroDamage", "heroDamage", "criticalDamage", "heroDamage", "tapDPS", "tapDamage", "goldAmount"], skillValue:[2.5, 6, 0.2, 4.5, 0.004, 0.1, 0.1]},
+				{name:"Mikey the Magician Apprentice", level:"0", dps:391.16E+9, cost:"2.44E+21", skillType:["heroDamage", "tapDamage", "allDamage", "criticalChance", "allDamage", "chestGold", "heroDamage"], skillValue:[2, 0.05, 0.3, 0.02, 0.1, 0.2, 100]},
+				{name:"Peter Pricker the Prickly Poker", level:"0", dps:391.16E+9, cost:"244E+21", skillType:["heroDamage", "heroDamage", "allDamage", "heroDamage", "allDamage", "criticalGold", "allDamage"], skillValue:[2.5, 7.5, 0.1, 5, 0.1, 0.3, 0.2]},
+				{name:"Teeny Tom, Keeper of the Castle", level:"0", dps:391.16E+9, cost:"48.7E+24", skillType:["heroDamage", "heroDamage", "tapDPS", "criticalDamage", "tapDamage", "criticalChance", "heroDamage"], skillValue:[3, 8, 0.004, 0.2, 0.1, 0.02, 100]},
+				{name:"Denzis the Cleanser", level:"0", dps:391.16E+9, cost:"19.5E+27", skillType:["heroDamage", "heroDamage", "heroDamage", "goldAmount", "chestGold", "heroDamage", "allDamage"], skillValue:[2, 5, 12, 0.15, 0.2, 90, 0.15]},
+				{name:"Hamlette, Painter of Skulls", level:"0", dps:391.16E+9, cost:"21.4E+30", skillType:["tapDamage", "tapDamage", "tapDPS", "allDamage", "goldAmount", "criticalChance", "heroDamage"], skillValue:[0.05, 0.05, 0.004, 0.1, 0.15, 0.02, 150]},
+				{name:"Eistor the Banisher", level:"0", dps:391.16E+9, cost:"2.36E+36", skillType:["heroDamage", "heroDamage", "tapDPS", "bossDamage", "allDamage", "bossDamage", "goldAmount"], skillValue:[3.5, 6.5, 0.004, 0.5, 0.1, 0.05, 0.12]},
+				{name:"Flavius and Oinksbjorn", level:"0", dps:391.16E+9, cost:"25.9E+45", skillType:["heroDamage", "heroDamage", "allDamage", "bossDamage", "criticalChance", "criticalDamage", "chestGold"], skillValue:[3, 7, 0.1, 0.1, 0.02, 0.3, 0.2]},
+				{name:"Chester the Beast Tamer", level:"0", dps:391.16E+9, cost:"28.5E+60", skillType:["heroDamage", "allDamage", "heroDamage", "heroDamage", "criticalDamage", "criticalChance", "allDamage"], skillValue:[3.5, 0.01, 4, 6, 0.2, 0.03, 0.15]},
+				{name:"Mohacas the Wind Warrior", level:"0", dps:391.16E+9, cost:"3.14E+81", skillType:["heroDamage", "heroDamage", "goldAmount", "tapDamage", "goldAmount", "allDamage", "goldAmount"], skillValue:[3.3, 5.5, 0.1, 0.1, 0.2, 0.1, 0.3]}
+			];
+			var amulets = {
+				"valrunes": {name:"Amulet of the Valrunes", level:"0", maxLevel:-1, baseDamage:0.5, incrementDamage:0.25}, // Implemented
+				"resolution": {name:"Axe of Resolution", level:"0", maxLevel: -1, baseDamage:0.7, incrementDamage:0.35},
+				"mettle": {name:"Barbarian's Mettle", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
+				"contentment": {name:"Chest of Contentment", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},  // implemented
+				"elixir": {name:"Crafter's Elixir", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},	// implemented
+				"egg": {name:"Crown Egg", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},	// implemented 
+				"cloak": {name:"Dark Cloak of Life", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
+				"seeker": {name:"Death Seeker", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
+				"chalice": {name:"Divine Chalice", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
+				"hammer": {name:"Drunken Hammer", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},
+				"fortune": {name:"Future's Fortune", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
+				"ointment": {name:"Hunter's Ointment", level:"0", maxLevel:10, baseDamage:1.2, incrementDamage:0.6},
+				"thrust": {name:"Hero's Thrust", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
+				"shield": {name:"Knight's Shield", level:"0", maxLevel:-1, baseDamage:0.6, incrementDamage:0.3},
+				"pendant": {name:"Laborer's Pendant", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
+				"gauntlet": {name:"Ogre's Gauntlet", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
+				"armor": {name:"Otherworldly Armor", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
+				"lotion": {name:"Overseer's Lotion", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
+				"parchment": {name:"Parchment of Importance", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
+				"opulence": {name:"Ring of Opulence", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
+				"charm": {name:"Ring of Wonderous Charm", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
+				"scroll": {name:"Sacred Scroll", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
+				"saintly": {name:"Saintly Shield", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
+				"savior": {name:"Savoir Sield", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
+				"tincture": {name:"Tincture of the Maker", level:"0", maxLevel:-1, baseDamage:0.1, incrementDamage:0.05},
+				"fissure": {name:"Universal Vissure", level:"0", maxLevel:-1, baseDamage:1.2, incrementDamage:0.6},
+				"aura": {name:"Undead Aura", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
+				"revival": {name:"Warrior's Revival", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
+				"worldly": {name:"Worldly Illuminator", level:"0", maxLevel:5, baseDamage:3, incrementDamage:1.5}
+			};
+
+			function saveCookie()
+			{
+				console.log("saving cookie")
+				for(var i = 0; i < heros.length; i++)
+				{
+					var cookie = heros[i].level + "!";
+					//$.cookie("hero" + i, heros[i].level);
+
+					for(var j = 0; j < 7; j++)
+					{
+						if($("#hero" + i + "skill" + j).prop('checked'))
+							cookie += "1";
+						else
+							cookie += "0";
+						//$.cookie("hero" + i + "skill" + j, $("#hero" + i + "skill" + j).prop('checked'));
+					}
+					$.cookie("hero" + i, cookie);
+				}
+
+				for(var name in amulets)
+				{
+					$.cookie("amulet" + name, amulets[name].level);
+				}
+
+				$.cookie("stage", stageValues.stage);
+			}
+
+			function loadCookie()
+			{
+				console.log("loading cookie");
+				for(var i = 0; i < heros.length; i++)
+				{
+					var cookie = $.cookie("hero" + i).split("!");
+					heros[i].level = cookie[0];
+					$("#hero" + i).val(heros[i].level);
+
+					for(var j = 0; j < 7; j++)
+					{
+						if(cookie[1].charAt(j) == "1")
+							$("#hero" + i + "skill" + j).prop('checked', true);
+						else
+							$("#hero" + i + "skill" + j).prop('checked', false);
+					}
+				}
+
+				for(var name in amulets)
+				{
+					var level = $.cookie("amulet" + name);
+					if(level > 0)
+					{
+						amulets[name].level = level;
+						$("#" + name).val(level);
+					}
+				}
+
+				stageValues.stage = $.cookie("stage");
+				$("#stage").val(stageValues.stage);
+			}
+		</script>
+	</head>
+	<script>loadCookie()</script>
+	<h2><p id="r2">Tap Tap Titans Calculator</p></h2>
+	<p id="tstage">Stage: 0</p>
+	<p id="tmobhealth">Mob Health: 0</p>
+	<p id="tbosshealth">Boss Health: 0</p>
+	<p id="tgoldmultiplier">Gold Multiplier: 0</p>
+	<p id="tmobgold">Mob Gold: 0</p>
+	<p id="tbossgold">Boss Gold: 0</p>
+	<p id="tchestersonchance">Chesterson Chance: 0.02</p>
+	<p id="tchestersongold">Chesterson Gold: 0<p>
+	<p id="tstagegold">Stage Gold: 0<p>
+	<p id="tartifcatmultiplier">Artifact Damage: 0"</p>
+	<p id="talldamage">Hero All Damage: 0</p>
+	<p id="therodps">Hero DPS: 0</p>
+	<p id="ttapdamage">Tap Damage: 0</p>
+	<p id="tcriticalmultiplier">Critical Multiplier: 10</p>
+	<p id="tcriticaldamage">Critical Damage: 0</p>
+	<p id="tcriticalchance">Critical Chance: 2%</p>
+	<p id="ttapdps">Tap DPS (at 7 tps): 0</p>
+	<p id="tsecondstokillboss">Seconds to Kill Boss: 0 </p>
+
+	<br>
+	<h2><p>Enter information from your game.</p></h2>
+	<form id="form" name="form">
+		Stage: <input type="number" id="stage" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/><br>
+		<table>
+			<tr>
+				<td valign="top">
+					<a href="#" id="hideartifacts">Hide Artifacts</a><br>
+					<div style="height:300px;overflow:auto;">
+						<table id="artifacts">
+							<script>
+								for(var key in amulets)
+								{
+									document.write("<tr>");
+									document.write("<td>" + amulets[key].name + "</td>");
+									document.write("<td><input style=\"width: 50px;\" type=\"number\" id=\"" + key + "\" value=\"0\" onchange=\"updateArtifacts()\"></td>");
+									document.write("<td id=\"" + key + "damage" + "\">0%</td>");
+									document.write("</tr>");
+								}
+							</script>
+						</table><br>
+					</div>
+				</td>
+				<td valign="top">
+					<a href="#" id="hideheros">Hide Heros</a><br>
+					<div style="height:300px;width:520px;overflow:auto;">
+						<table id="heros">
+							<script>
+								for(var i = 0; i < heros.length; i++)
+								{
+									document.write("<tr>");
+									document.write("<td>" + heros[i].name + "</td>");
+									document.write("<td><input style=\"width: 50px;\" type=\"number\" id=\"hero" + i + "\" onchange=\"updateHeroLevel()\">")
+									for(var j = 0; j < 7; j++)
+									{
+										document.write("<input class=\"shadow\", type=\"checkbox\" id=\"hero" + i + "skill" + j + "\" onchange=\"updateSkillChecks(" + i + ", " + j + ")\">");
+									}
+									document.write("</td><td id=\"hero" + i + "dps\">Hero DPS: </td>");
+									document.write("</tr>");
+								}
+							</script>	
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<input id="maxstage" type="button" value="Maximize" onclick="findMaxStage()" />
+		<input id="load" type="button" value="Load" onclick="loadCookie()"/>
+		<input id="save" type="button" value="Save" onclick="saveCookie()"/>
+	</form>
+	<style>
+		.shadow
+		{
+		    box-shadow: 0px 0px 5px #0011dd;
+		}
+		.scrolltable
+		{
+			height: 150px;
+			overflow: scroll;
+		}
+	</style>
+	<script>
+		loadCookie();
+	</script>
+</html>
+
+<script>
+	$(function() {
+		updateHeroLevel();
+		updateArtifacts();
+
+		$("#submit").click(function() {
+				for(var i = 0; i < heros.length; i++)
+				{
+					heros[i].level = 0;
+					$("#hero" + i).val(0);
+
+					for(var j = 0; j < 7; j++)
+					{
+						$("#hero" + i + "skill" + j).prop('checked', false);
+					}
+				}
+		});
+		
+		$("#hideartifacts").click(function() {
+			var table = document.getElementById("artifacts");
+			if($("#artifacts").hasClass("hidden"))
+			{
+				table.style.display = "table";
+				$("#artifacts").removeClass("hidden");
+			}
+			else
+			{
+				table.style.display = "none";
+				$("#artifacts").addClass("hidden");
+			}
+		});
+		
+		$("#hideheros").click(function() {
+			var table = document.getElementById("heros");
+			if($("#heros").hasClass("hidden"))
+			{
+				table.style.display = "table";
+				$("#heros").removeClass("hidden");
+			}
+			else
+			{
+				table.style.display = "none";
+				$("#heros").addClass("hidden");
+			}
+		});
+	});
+</script>
+
+<script>
+	function findMaxStage()
+	{
+
+
+		for(var stage = 160; stage < 800; stage += 5)
+		{
+			var sumBaseGold = 18.5 * (6.37E+30 + 3.63E+30 * (Math.pow(1.17, stage-156) - 1)/0.17);
+			sumBaseGold *= (0.02 + (0.00045 * 150));
+			
+			var chestChance = 0.02 * (1 + 0.2 * amulets["egg"].level);
+			var totalMobGold = 10 * (1 - chestChance) * sumBaseGold * Math.ceil(1 + heroSkills["goldAmount"] + 0.05 * amulets["fortune"].level) * (1 + (0.1 * amulets["valrunes"].level)) * (1 + (0.15 * amulets["elixir"].level));
+			var totalBossGold = 5.8 * sumBaseGold * Math.ceil(1 + heroSkills["goldAmount"] + 0.05 * amulets["fortune"].level) * (1 + 1 * amulets["shield"].level) * (1 + (0.15 * amulets["elixir"].level));
+			var totalChestGold = chestChance * 10 * sumBaseGold * Math.ceil(1 + heroSkills["goldAmount"] + 0.05 * amulets["fortune"].level)  * (1 + heroSkills["chestGold"]) * (1 + (0.4 * amulets["contentment"].level)) * (1 + (0.15 * amulets["elixir"].level));
+			var sumTotalGold = totalMobGold + totalBossGold + totalChestGold;
+			console.log("Total gold " + stage + ": " + formatNumber(sumTotalGold));
+
+			var maxHeroId
+			for(var i = heros.length - 1; i > 20; i--)
+			{
+				if(heros[i].cost < sumTotalGold)
+				{
+					maxHeroId = i;
+					break;
+				}
+			}
+
+			var heroLevel = Math.floor(Math.log(sumTotalGold*(0.075/heros[maxHeroId].cost) + 1)/Math.log(1.075));
+			var dps = heroDPS(maxHeroId + 1, heroLevel) * (1 + +(amuletDamage));
+			console.log("Hero:" + heros[maxHeroId].name + " Level: " + heroLevel);
+			
+			var heroMultiplier = 0;
+			for(var i = 0; i < 7; i++)
+			{
+				if(heroLevel < skillAtLevel[i])
+					break;
+
+				if(heros[maxHeroId].skillType[i] == "heroDamage");
+					heroMultiplier += heros[maxHeroId].skillValue[i];
+			}
+
+			dps *= 1 + +(heroMultiplier);
+
+			var tapDamage = (dps * heroSkills["tapDPS"]) * (1 + heroSkills["tapDamage"]) * (1 + amuletDamage) * (1 + 0.1*amulets["hammer"].level);
+			var criticalMultiplier = (10 + +(heroSkills["criticalDamage"])) * (1 + 0.2*amulets["thrust"].level);
+			var criticalDamage = tapDamage * criticalMultiplier * 0.65;
+			var criticalChance = 0.01 + heroSkills["criticalChance"] + 0.02 * amulets["seeker"].level;
+			var tapDPS = (1-criticalChance) * tapDamage + criticalChance * criticalDamage;
+			tapDPS *= 10; //Taps per second
+			var totalDPS = dps + tapDPS;
+			console.log("DPS:" + formatNumber(totalDPS));
+
+			var baseHealth = 18.5 * Math.pow(1.57, 156) * Math.pow(1.17, stage - 156);
+			var bossHealth = baseHealth * 10 * (1 - 0.02 * amulets["cloak"].level);
+
+
+			var bossTime = bossHealth/totalDPS;
+			console.log("Boss Health: " + formatNumber(bossHealth));
+			console.log("Time to kill Boss: " + bossTime);
+		}
+
+	}
+
+	function updateSkillChecks(hero, skill)
+	{
+		var skillEnabled = $("#hero" + hero + "skill" + skill).prop('checked');
+
+		if(skillEnabled)
+		{
+			if(heros[hero].level < skillAtLevel[skill])
+			{
+				heros[hero].level = skillAtLevel[skill];
+				$("#hero" + hero).val(skillAtLevel[skill]);
+			}
+			for(var i = 0; i < skill; i++)
+			{
+				$("#hero" + hero + "skill" + i).prop('checked', true);
+			}
+		}
+		else
+		{
+			for(var i = skill + 1; i < 7; i++)
+			{
+				$("#hero" + hero + "skill" + i).prop('checked', false);
+			}
+		}
+
+		updateHeroLevel();
+	}
+
+	function heroDPS(heroID, level)
+	{
+		var baseCost = heros[heroID-1].cost;
+
+		return baseCost * Math.pow(1.075, level-1) * (Math.pow(1.075,level) - 1)  * Math.pow(0.904, level-1) * Math.pow(1 - (0.019 * (Math.min(heroID, 15))), heroID) / (0.075) * 0.1;
+	}
+
+	function updateHeroLevel()
+	{
+		heroSkills = {
+				heroDamage: 0,
+				allDamage: 0,
+				tapDamage: 0,
+				bossDamage: 0,
+				criticalDamage: 0,
+				criticalChance: 0,
+				goldAmount: 0,
+				chestGold: 0,
+				tapDPS: 0
+			};
+		for(var i = 0; i < heros.length; i++)
+		{
+			var hlabel = "#hero" + i;
+			heros[i].level = $(hlabel).val();
+			for(var j = 0; j < 7; j++)
+			{
+				var skillEnabled = $(hlabel + "skill" + j).prop('checked');
+
+				if(heros[i].level >= skillAtLevel[j])
+				{
+					if(heroSkills[heros[i].skillType[j]] == undefined)
+					{
+						heroSkills[heros[i].skillType[j]] = 0;
+					}
+					heroSkills[heros[i].skillType[j]] += heros[i].skillValue[j];
+
+				}
+			}
+		}
+
+		updateTitans();
+	}
+
+	function updateStage()
+	{
+		stageValues.stage = $("#stage").val();
+		var baseHealth = 18.5 * Math.pow(1.57, Math.min(stageValues.stage, 156)) * Math.pow(1.17, Math.max(stageValues.stage - 156, 0));
+		var baseGold = baseHealth * (0.02 + (0.00045 * Math.min(stageValues.stage, 150)));
+
+		stageValues.bossHealth = baseHealth * bossMultiplier[(stageValues.stage-1)%5] * (1 - 0.02 * amulets["cloak"].level);
+		stageValues.mobHealth = baseHealth;
+		stageValues.mobGold = baseGold * Math.ceil(1 + heroSkills["goldAmount"] + 0.05 * amulets["fortune"].level) * (1 + (0.1 * amulets["valrunes"].level)) * (1 + (0.15 * amulets["elixir"].level));
+		stageValues.bossGold = baseGold * bossMultiplier[(stageValues.stage-1)%5] * Math.ceil(1 + heroSkills["goldAmount"] + 0.05 * amulets["fortune"].level) * (1 + 1 * amulets["shield"].level) * (1 + (0.15 * amulets["elixir"].level));
+		stageValues.chestGold = 10 * baseGold * Math.ceil(1 + heroSkills["goldAmount"] + 0.05 * amulets["fortune"].level)  * (1 + heroSkills["chestGold"]) * (1 + (0.4 * amulets["contentment"].level)) * (1 + (0.15 * amulets["elixir"].level));
+		stageValues.chestChance = 0.02 * (1 + 0.2 * amulets["egg"].level);
+		
+	}
+
+	function updateArtifacts(name)
+	{
+		amuletDamage = 0;
+		for(var key in amulets)
+		{
+			amulets[key].level = $("#" + key).val();
+			if(amulets[key].level > 0)
+			{
+				var currDamage = amulets[key].incrementDamage * (1 + +(amulets[key].level))
+				amuletDamage += currDamage;
+				setText(key + "damage", Math.round(currDamage*100) + "%");
+				//alert($("#" + key + "damage"))
+			}
+		}
+
+		amuletDamage *= 1 + 0.05 * amulets["tincture"].level;
+		
+		updateTitans();
+	}
+	
+	function updateTitans()
+	{	
+
+		gameValues.heroDamage = 0;
+		for(var i = 0; i < heros.length; i++)
+		{
+			var heroDamage = heroDPS(i+1, heros[i].level);
+			var heroMultiplier = 0;
+
+			if(heroSkills["allDamage"] > 0)
+			{
+				heroMultiplier += heroSkills["allDamage"];
+			}
+			for(var j = 0; j < 7; j++)
+			{
+				var hlabel = "#hero" + i;
+				var skillEnabled = $(hlabel + "skill" + j).prop('checked');
+				if(skillEnabled)
+				{
+					if(heros[i].skillType[j] == 'heroDamage')
+					{
+						heroMultiplier += heros[i].skillValue[j];
+					}
+				}
+			}
+
+			heroDamage *= 1 + heroMultiplier;
+			heroDamage *= 1 + amuletDamage;
+			gameValues.heroDamage += heroDamage;
+
+			setText("hero" + i + "dps", formatNumber(heroDamage));
+		}	
+
+		updateStage();
+		
+		gameValues.tapDamage = (gameValues.heroLevel * Math.pow(1.05, gameValues.heroLevel) * (1 + heroSkills["allDamage"]) + gameValues.heroDamage * heroSkills["tapDPS"]) * (1 + heroSkills["tapDamage"]) * (1 + amuletDamage) * (1 + 0.1*amulets["hammer"].level);
+		gameValues.criticalMultiplier = (10 + +(heroSkills["criticalDamage"])) * (1 + 0.2*amulets["thrust"].level);
+		gameValues.criticalDamage = gameValues.tapDamage * gameValues.criticalMultiplier * 0.65;
+		gameValues.criticalChance = 0.01 + heroSkills["criticalChance"] + 0.02 * amulets["seeker"].level;
+		gameValues.tapDPS = (1-gameValues.criticalChance) * gameValues.tapDamage + gameValues.criticalChance * gameValues.criticalDamage
+		gameValues.tapDPS *= 9; //Taps per second
+
+		updateText();
+		saveCookie();
+	}
+
+	function updateText()
+	{
+		var stageGold = 10 * stageValues.chestChance * stageValues.chestGold + 10 * (1 - stageValues.chestChance) * stageValues.mobGold + stageValues.bossGold;
+
+		if(heroSkills["goldAmount"] > 0)
+			setText("tgoldmultiplier", "Gold Multiplier: " + (heroSkills["goldAmount"]*100) + "%");
+		setText("tstage", "Stage: " + stageValues.stage);
+		setText("tmobhealth", "Mob Health: " + formatNumber(stageValues.mobHealth));
+		setText("tbosshealth", "Boss Health: " + formatNumber(stageValues.bossHealth));
+		setText("tmobgold", "Mob Gold: " + formatNumber(stageValues.mobGold));
+		setText("tbossgold", "Boss Gold: " + formatNumber(stageValues.bossGold));
+		setText("tchestersonchance", "Chesterson Chance: " + stageValues.chestChance);
+		setText("tchestersongold", "Chesterson Gold: " + formatNumber(stageValues.chestGold));
+		setText("tstagegold", "Stage Gold: " + formatNumber(stageGold));
+		setText("tartifcatmultiplier", "Artifact Damage: " + Math.round(amuletDamage * 100) + "%");
+		setText("talldamage", "Hero All Damage: " + heroSkills["allDamage"] * 100 + "%");
+		setText("therodps", "Hero DPS: " + formatNumber(gameValues.heroDamage));
+		setText("ttapdamage", "Tap Damage: " + formatNumber(gameValues.tapDamage));
+		setText("tcriticalmultiplier", "Critical Multiplier: " + gameValues.criticalMultiplier);
+		setText("tcriticaldamage", "Critical Damage: " + formatNumber(gameValues.criticalDamage));
+		setText("tcriticalchance", "Critical Chance: " + gameValues.criticalChance*100 + "%");
+		setText("ttapdps", "Tap DPS (at 7 tps): " + formatNumber(gameValues.tapDPS));
+		console.log()
+		setText("tsecondstokillboss", "Seconds to Kill Boss:" + (stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))).toFixed(2));
+	}
+	
+	function setText(name, text)
+	{
+		element = document.getElementById(name);
+		element.innerHTML = text;
+	}
+	
+	function formatNumber(num)
+	{
+		var count = 0;
+		while(num >= 1000)
+		{
+			num /= 1000;
+			count++;
+		}
+		num = +(num).toFixed(2);
+		
+		var exp = "+E" + count*3;
+		if(count < 31)
+		{
+			if(count == 0) {
+				exp = "";
+			} else if(count == 1) {
+				exp = "K";
+			} else if(count == 2) {
+				exp = "M";
+			} else if(count == 3) {
+				exp = "B";
+			} else if(count == 4) {
+				exp = "T";
+			} else {
+				exp = String.fromCharCode(97 + count - 5) + String.fromCharCode(97 + count - 5);
+			}
+		}
+		
+		return num + exp
+	}
+</script>
