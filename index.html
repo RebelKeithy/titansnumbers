@@ -409,12 +409,19 @@
 	{
 		var baseCost = heros[heroID-1].cost;
 		var evolved = level > 1000;
+		console.log(level + " " + evolved);
 
 		var A = baseCost * (evolved ? 10 : 1) * Math.pow(1.075, level - 1);
 		var B = Math.pow(1.075, evolved ? level - 1000 : level) - 1;
 		var C = Math.pow(0.904, evolved ? level - 1001 : level - 1) * Math.pow(1 - (0.019 * (evolved ? 15 : Math.min(heroID, 15))), heroID + (evolved ? 30 : 0));
 
 		return A * B * C / 0.75;
+
+		//(((HeroBaseCost * 10 * 1.075(level-1) * (1.075^(Level - 1000) - 1.0) / 0.075) * (0.904^(level - 1001) * (1f - (0.019 * 15))^heroID + 30)) * 0.1) 
+
+		//return baseCost * (evolved ? 10 : 1) * A * B * C * 0.1/0.075;
+
+		//return baseCost * (evolved ? 10 : 1) * Math.pow(1.075, level-1) * (Math.pow(1.075,(evolved ? level - 1000 : level)) - 1)  * (Math.pow(0.904, level-(evolved ? 1001 : 1)) * (Math.pow(1 - (0.019 * (Math.min(heroID, 15))), heroID) + (evolved ? 30 : 0))) / (0.075) * 0.1;
 	}
 
 	function updateHeroLevel()
@@ -487,9 +494,13 @@
 		for(var key in amulets)
 		{
 			amulets[key].level = $("#" + key).val();
+		}
+
+		for(var key in amulets)
+		{
 			if(amulets[key].level > 0)
 			{
-				var currDamage = amulets[key].incrementDamage * (1 + +(amulets[key].level))
+				var currDamage = amulets[key].incrementDamage * (1 + +(amulets[key].level)) * (1 + 0.05 * amulets["tincture"].level);
 				amuletDamage += currDamage;
 				setText(key + "damage", Math.round(currDamage*100) + "%");
 				//alert($("#" + key + "damage"))
@@ -499,8 +510,6 @@
 				setText(key + "damage", "0%");
 			}
 		}
-
-		amuletDamage *= 1 + 0.05 * amulets["tincture"].level;
 		
 		updateTitans();
 	}
