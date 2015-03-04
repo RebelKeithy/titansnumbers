@@ -408,8 +408,13 @@
 	function heroDPS(heroID, level)
 	{
 		var baseCost = heros[heroID-1].cost;
+		var evolved = level > 1000;
 
-		return baseCost * Math.pow(1.075, level-1) * (Math.pow(1.075,level) - 1)  * Math.pow(0.904, level-1) * Math.pow(1 - (0.019 * (Math.min(heroID, 15))), heroID) / (0.075) * 0.1;
+		var A = baseCost * (evolved ? 10 : 1) * Math.pow(1.075, level - 1);
+		var B = Math.pow(1.075, evolved ? level - 1000 : level) - 1;
+		var C = Math.pow(0.904, evolved ? level - 1001 : level - 1) * Math.pow(1 - (0.019 * (evolved ? 15 : Math.min(heroID, 15))), heroID + (evolved ? 30 : 0));
+
+		return A * B * C / 0.75;
 	}
 
 	function updateHeroLevel()
