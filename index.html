@@ -109,6 +109,95 @@
 				"worldly": {name:"Worldly Illuminator", level:"0", maxLevel:5, baseDamage:3, incrementDamage:1.5}
 			};
 
+			function loadGameFromString()
+			{
+				var saveString = prompt("Enter your save string.");
+
+				loadFromString(window.atob(saveString));
+			}
+
+			function saveGameToString()
+			{
+				var saveString = getSaveString();
+
+				window.prompt("Here is the save string", window.btoa(saveString));
+			}
+
+			function getSaveString()
+			{
+				var saveString = "1"; //saveVersion
+
+				saveString += "|" + stageValues.stage;
+
+				for(var i = 0; i < heros.length; i++)
+				{
+					saveString += "|" + heros[i].level + "!";
+
+					for(var j = 0; j < 7; j++)
+					{
+						if(heros[i].skillBought[j])
+							saveString += "1";
+						else
+							saveString += "0";
+					}
+				}
+
+				for(var name in amulets)
+				{
+					saveString += "|" + name + "|" + amulets[name].level;
+				}
+
+				return saveString;
+			}
+
+			function loadFromString(saveString)
+			{
+				var splitSaveString = saveString.split("|");
+
+				stageValues.stage = splitSaveString[1];
+				$("#stage").val(stageValues.stage);
+
+				for(var i = 0; i < heros.length; i++)
+				{
+					console.log("loading hero " + i + " " + splitSaveString[2 + i]);
+					var heroString = splitSaveString[2 + i].split("!");
+					heros[i].level = heroString[0];
+
+					if(heros[i].level > 0)
+						$("#hero" + i).val(heros[i].level);
+					else
+						$("#hero" + i).val(0);
+
+					for(var j = 0; j < 7; j++)
+					{
+						if(heroString[1].charAt(j) == "1")
+						{
+							$("#hero" + i + "skill" + j).prop('checked', true);
+							heros[i].skillBought[j] = true;
+						}
+						else
+						{
+							$("#hero" + i + "skill" + j).prop('checked', false);
+							heros[i].skillBought[j] = false;
+						}
+					}
+				}
+
+				console.log("loading amulets... " + amulets.length);
+				for(var i = 0; i < 29; i++)
+				{
+					var amuletName = splitSaveString[32 + i * 2];
+					var level = splitSaveString[33 + i * 2];
+					console.log("loading amulet " + amuletName + " " + level);
+					if(level > 0)
+					{
+						amulets[amuletName].level = level;
+						$("#" + amuletName).val(level);
+					}
+				}
+
+			}
+
 			function saveCookie()
 			{
 				for(var i = 0; i < heros.length; i++)
@@ -117,7 +206,7 @@
 
 					for(var j = 0; j < 7; j++)
 					{
-						if($("#hero" + i + "skill" + j).prop('checked'))
+						if(heros[i].skillBought[j])
 							cookie += "1";
 						else
 							cookie += "0";
@@ -245,9 +334,9 @@
 				</td>
 			</tr>
 		</table>
-		<!--<input id="maxstage" type="button" value="Maximize" onclick="findMaxStage()" />
-		<input id="load" type="button" value="Load" onclick="loadCookie()"/>
-		<input id="save" type="button" value="Save" onclick="saveCookie()"/>-->
+		<!--<input id="maxstage" type="button" value="Maximize" onclick="findMaxStage()" />-->
+		<input id="load" type="button" value="Load" onclick="loadGameFromString()"/>
+		<input id="save" type="button" value="Save" onclick="saveGameToString()"/>
 	</form>
 	<style>
 		.scrolltable
