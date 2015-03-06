@@ -107,6 +107,18 @@
 				chestGold: 0,
 				tapDPS: 0
 			}
+
+			var skillTranslation = {
+				heroDamage: "Increase this hero's damage by ",
+				allDamage: "Increase ALL damage by ",
+				criticalDamage: "Increase critical damage by ",
+				bossDamage: "Increase all damage on Boss by ",
+				tapDamage: "Increase this tap damage by ",
+				tapDPS: "Increase tap damage by total DPS ",
+				criticalChance: "Increase critical chance by ",
+				goldAmount: "Increase gold dropped amount by ",
+				chestGold: "Increase treasure chest gold by "
+			}
 			
 			// dps field is never used and should be remove
 			var heros = [
@@ -193,6 +205,7 @@
 				var saveString = "1"; //saveVersion
 
 				saveString += "|" + stageValues.stage;
+				saveString += "|" + gameValues.heroLevel;
 
 				for(var i = 0; i < heros.length; i++)
 				{
@@ -222,11 +235,12 @@
 				var splitSaveString = saveString.split("|");
 
 				stageValues.stage = splitSaveString[1];
+				gameValues.heroLevel = splitSaveString[2];
 				$("#stage").val(stageValues.stage);
 
 				for(var i = 0; i < heros.length; i++)
 				{
-					var heroString = splitSaveString[2 + i].split("!");
+					var heroString = splitSaveString[3 + i].split("!");
 					heros[i].level = heroString[0];
 
 					if(heros[i].level > 0)
@@ -258,8 +272,8 @@
 
 				for(var i = 0; i < 29; i++)
 				{
-					var amuletName = splitSaveString[32 + i * 2];
-					var level = splitSaveString[33 + i * 2];
+					var amuletName = splitSaveString[33 + i * 2];
+					var level = splitSaveString[34 + i * 2];
 					if(level > 0)
 					{
 						amulets[amuletName].level = level;
@@ -292,6 +306,7 @@
 				}
 
 				$.cookie("stage", stageValues.stage);
+				$.cookie("heroLevel", gameValues.heroLevel);
 			}
 
 			function loadCookie()
@@ -338,104 +353,252 @@
 
 				stageValues.stage = $.cookie("stage");
 				$("#stage").val(stageValues.stage);
+				gameValues.heroLevel = $.cookie("heroLevel");
+				$("#taphero").val(gameValues.heroLevel);
 			}
 		</script>
 	</head>
+	<body>
 	<script>loadCookie()</script>
-	<h2><p id="r2">Tap Titans Optimizer</p></h2>
-	<p id="tstage">Stage: 0</p>
-	<p id="tmobhealth">Mob Health: 0</p>
-	<p id="tbosshealth">Boss Health: 0</p>
-	<p id="tgoldmultiplier">Gold Multiplier: 0</p>
-	<p id="tmobgold">Mob Gold: 0</p>
-	<p id="tbossgold">Boss Gold: 0</p>
-	<p id="tchestersonchance">Chesterson Chance: 0.02</p>
-	<p id="tchestersongold">Chesterson Gold: 0<p>
-	<p id="tstagegold">Stage Gold: 0<p>
-	<p id="tartifcatmultiplier">Artifact Damage: 0"</p>
-	<p id="talldamage">Hero All Damage: 0</p>
-	<p id="ttapdamage">Tap Damage: 0</p>
-	<p id="tcriticalmultiplier">Critical Multiplier: 10</p>
-	<p id="tcriticaldamage">Critical Damage: 0</p>
-	<p id="tcriticalchance">Critical Chance: 2%</p>
-	<p id="tsecondstokillboss">Seconds to Kill Boss: 0 </p>
+	<h2><p id="r2" style="text-align:center; padding-top:10px; font-weight:bold; font-size:150%; font-family: sans-serif; color:#FFFFFF; text-shadow: 2px 2px 2px #555555;">Tap Titans Optimizer</p></h2>
+	<table align="center">
+		<tr>
+			<td valign="top">
+				<table cellspacing="0" class="titanstext" style="margin-right:10px">
+					<tr class="greenRow">
+						<td>Stage:</td>
+						<td id="tstage"><input class="titanstext" type="number" id="stage" style="width:70px; background-color:#78BC87" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="greenRow">
+						<td>Hero Level:</td>
+						<td id="therolevel"><input class="titanstext" type="number" id="taphero" style="width:70px; background-color:#78BC87" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="greenRow">
+						<td>Hero DPS:</td>
+						<td id="therodps">0</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="greenRow">
+						<td>Tap Damage:</td>
+						<td id="ttapdamage">1</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="greenRow">
+						<td>Critical Damage:</td>
+						<td id="tcriticaldamage">10</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="greenRow">
+						<td>Critical Chance:</td>
+						<td id="tcriticalchance">1%</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="greenRow">
+						<td>Total DPS (10 tps):</td>
+						<td id="ttotaldps">10</td>
+					</tr>
+				</table>
+			</td>
+			<td valign="top">
+				<table cellspacing="0" class="titanstext" >
+					<tr class="goldRow">
+						<td>Mob Gold:</td>
+						<td id="tmobgold">1</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="goldRow">
+						<td>Chest Gold:</td>
+						<td id="tchestgold">10</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="goldRow">
+						<td>Chest Chance:</td>
+						<td id="tchestchance">2%</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="goldRow">
+						<td>Boss Gold:</td>
+						<td id="tbossgold">2</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="goldRow">
+						<td>Stage Gold:</td>
+						<td id="tstagegold">12</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="spacing"></tr>
+					<tr class="redRow">
+						<td>Mob Health:</td>
+						<td id="tmobhealth">30</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="redRow">
+						<td>Boss Health</td>
+						<td id="tbosshealth">60</td>
+					</tr>
+					<tr class="spacing"></tr>
+					<tr class="redRow">
+						<td>Time to kill Boss</td>
+						<td id="tsecondstokillboss">10</td>
+					</td>
+				</table>
+			</td>
+		</tr>
+	</table>
 
-	<br>
-	<h2><p>Enter information from your game.</p></h2>
-	<form id="form" name="form">
-		<p>Stage: <input type="number" id="stage" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></p>
-		<p>Hero: <input type="number" id="taphero" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></p><div id="tabs-container">
-	    
-	    <div id="topbar"><div id="therodps" style="display:inline" >Hero DPS: 0</div><div style="display:inline;padding-left:20px" id="ttapdps">Tap DPS: 0</div></div>
-	    <div class="tab" style="background-color:#000000">
-	        <div id="tab-2" class="tab-content">
+	<style>
+		.redRow > td:first-of-type
+		{
+			background-image: url("images/redRowLeft.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			padding-left: 10px;
+			height:45px;
+			width: 150px;
+		}
+		.redRow > td:last-of-type
+		{
+			background-image: url("images/redRowRight.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			text-align: right;
+			padding-right: 10px;
+			height:45px;
+			width: 100px;
+		}
+		.greenRow > td:first-of-type
+		{
+			background-image: url("images/greenRowLeft.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			padding-left: 10px;
+			height:45px;
+			width: 150px;
+		}
+		.greenRow > td:last-of-type
+		{
+			background-image: url("images/greenRowRight.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			text-align: right;
+			padding-right: 10px;
+			height:45px;
+			width: 100px;
+		}
+		.goldRow > td:first-of-type
+		{
+			background-image: url("images/goldRowLeft.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			padding-left: 10px;
+			height:45px;
+			width: 150px;
+		}
+		.goldRow > td:last-of-type
+		{
+			background-image: url("images/goldRowRight.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			text-align: right;
+			padding-right: 10px;
+			height:45px;
+			width: 100px;
+		}
+		.damagecell
+		{
+			height: 45;
+			width: 300;
+			margin: 0 0 -45px 0;
+			background: url("images/goldRow.png");
+			background-size: 100% 100%;
+   			padding:0;
+		}
+	</style>
 
-				<div style="height:300px;overflow:auto;background-color:#161616">
-					<table cellspacing="0" id="artifacts" style="padding-left: 6px">
-						<script>
-							for(var key in amulets)
-							{
-								document.write("<tr class=\"spacing\"></tr>");
-								document.write("<tr class=\"artifactRow\" style=\"height:92px; padding-right:20px\">");
-								document.write("<td align=\"center\" style=\"padding-left:7px; padding-top:3px\"><div class=\"artifactimage\" style=\"background: url(images/artifacts.png) " + amuletImageIndex[key].x * 64 + " " + amuletImageIndex[key].y * 64 + "/256px 512px\"></div></td>");
-								document.write("<td><table style=\"width:275\">");
-								document.write("<tr><td class=\"titanstext\">" + amulets[key].name + "</td></tr>");
-								document.write("<tr><td class=\"titanstext\" id=\"" + key + "bonus\">+0%</td></tr>");
-								document.write("<tr><td class=\"titanstext\" id=\"" + key + "damage\">+0% All Damage</td></tr>");
-								document.write("</table></td>");
-								document.write("<td style=\"padding-right:20px\"><table style=\"width:200\">");
-								document.write("<tr><td class=\"titanstext\" style=\"padding-right: 0px; text-align: right\">Lv.<input class=\"titanstext\" style=\"width: 50px; margin-left:6px; background-color:#555555; border:2px solid #CCCCCC\" type=\"number\" id=\"" + key + "\" value=\"0\" onchange=\"updateArtifacts()\"></td></tr>");
-								document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Next Level <img src=\"images\\relic.png\" height=\"11\" width=\"13\"> <div id=\"" + key + "nextlevel\" style=\"display: inline-block\">0</div></td></tr>");
-								document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Total Spent <img src=\"images\\relic.png\" height=\"11\" width=\"13\"> <div id=\"" + key + "totalspent\"  style=\"display: inline-block\">0</td></tr>");
-								document.write("</table></td>");
-								document.write("</tr>");
-							}
-						</script>
-						<td><input type="button" value="Reset Artifacts" onclick="resetArtifacts()">	
-					</table><br>
-				</div>
-			</div>
+	<div id="tabs-container" style="padding-top:25px">
 
-	        <div id="tab-1" class="tab-content">
+	<input id="load" type="button" value="Load" onclick="loadGameFromString()"/>
+	<input id="save" type="button" value="Save" onclick="saveGameToString()"/>
+    <div id="topbar"><div id="therodpsbar" style="display:inline" >Hero DPS: 0</div>
+    <div style="display:inline;padding-left:30px">Tap DPS:</div><div style="display:inline" id="ttapdps">0</div>
+    <div style="display:inline;padding-left:30px">Artifact Multiplier:</div><div style="display:inline" id="tartifcatmultiplier">0%</div></div>
+    <div class="tab" style="background-color:#000000" align="center">
+        <div id="tab-2" class="tab-content">
 
-				<div style="height:300px;overflow:auto;background-color:#161616">
-					<table cellspacing="0" id="heros" style="padding-left: 6px">
-						<script>
+			<div style="height:400px;overflow:auto;background-color:#161616">
+				<table cellspacing="0" id="artifacts" style="padding-left: 6px">
+					<script>
+						for(var key in amulets)
+						{
 							document.write("<tr class=\"spacing\"></tr>");
-							for(var i = 0; i < heros.length; i++)
-							{
-								document.write("<tr class=\"heroRow\" style=\"height:92px;\">");
-								document.write("<td align=\"center\" style=\"padding-left:7px; padding-top:5px\"><div class=\"heroimage\" style=\"background: url(images/heros.png) " + heroImageIndex[i].x * 60 + " " + heroImageIndex[i].y * 60  + "/360px 360px\"></div></td>");
-								document.write("<td>");
-								document.write("<table>");
-								document.write("<tr class=\"titanstext\"><td colspan=\"3\">" + heros[i].name + "</td></tr>");
-								document.write("<tr class=\"titanstext\"><td><div style=\"display: inline-block\">Lv. </div><input class=\"titanstext\" class=\"heroLevel\" style=\"margin-left: 6px; background-color:#555555; border:2px solid #CCCCCC; width: 50px;\" type=\"number\" id=\"hero" + i + "\" onchange=\"updateHeroLevel(" + i + ")\"></td>")
-								document.write("<td>Weapon Upgrades <input class=\"titanstext\" style=\"background-color:#555555; width: 40px;\" type=\"number\" id=\"hero" + i + "upgrades\" onchange=\"updateHeroUpgrades(" + i + ")\"></td>")
-								document.write("</tr><tr class=\"titanstext\"><td>Skills ");
-								for(var j = 0; j < 7; j++)
-								{
-									document.write("<input class=\"heroSkill\", type=\"checkbox\" id=\"hero" + i + "skill" + j + "\" onchange=\"updateSkillChecks(" + i + ", " + j + ")\">");
-								}
-								document.write("</td></tr>")
-								document.write("</table>")
-								document.write("<td class=\"titanstext\" id=\"hero" + i + "dps\" style=\"padding-right: 20px; text-align: center\">Hero DPS: </td>");
-								document.write("</tr>");
-								document.write("<tr class=\"spacing\"></tr>");
-							}
-						</script>
-						<td><input type="button" value="Reset Heros" onclick="resetHeros()">	
-					</table>
-			    </div>
+							document.write("<tr class=\"artifactRow\" style=\"height:92px; padding-right:20px\">");
+							document.write("<td align=\"center\" style=\"padding-left:7px; padding-top:3px\"><div class=\"artifactimage\" style=\"background: url(images/artifacts.png) " + amuletImageIndex[key].x * 64 + " " + amuletImageIndex[key].y * 64 + "/256px 512px\"></div></td>");
+							document.write("<td><table style=\"width:275\">");
+							document.write("<tr><td class=\"titanstext\">" + amulets[key].name + "</td></tr>");
+							document.write("<tr><td class=\"titanstext\" id=\"" + key + "bonus\">+0%</td></tr>");
+							document.write("<tr><td class=\"titanstext\" id=\"" + key + "damage\">+0% All Damage</td></tr>");
+							document.write("</table></td>");
+							document.write("<td style=\"padding-right:20px\"><table style=\"width:200\">");
+							document.write("<tr><td class=\"titanstext\" style=\"padding-right: 0px; text-align: right\">Lv.<input class=\"titanstext\" style=\"width: 50px; margin-left:6px; background-color:#555555; border:2px solid #CCCCCC\" type=\"number\" id=\"" + key + "\" value=\"0\" onchange=\"updateArtifacts()\"></td></tr>");
+							document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Next Level <img src=\"images\\relic.png\" height=\"11\" width=\"13\"> <div id=\"" + key + "nextlevel\" style=\"display: inline-block\">0</div></td></tr>");
+							document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Total Spent <img src=\"images\\relic.png\" height=\"11\" width=\"13\"> <div id=\"" + key + "totalspent\"  style=\"display: inline-block\">0</td></tr>");
+							document.write("</table></td>");
+							document.write("</tr>");
+						}
+					</script>
+					<td><input type="button" value="Reset Artifacts" onclick="resetArtifacts()">	
+				</table><br>
 			</div>
 		</div>
-		<!--<input id="maxstage" type="button" value="Maximize" onclick="findMaxStage()" />-->
-	    <div style="height:49px;background-color:#000000" class="tabs-menu" padding="10">
-			<div id="btnherotab" href="#tab-1"></div>
-			<div id="btnartifactstab" href="#tab-2"></div>
+        <div id="tab-1" class="tab-content">
+
+			<div style="height:400px;overflow:auto;background-color:#161616">
+				<table cellspacing="0" id="heros" style="padding-left: 6px">
+					<script>
+						document.write("<tr class=\"spacing\"></tr>");
+						for(var i = 0; i < heros.length; i++)
+						{
+							document.write("<tr class=\"heroRow\" style=\"height:92px;\">");
+							document.write("<td align=\"center\" style=\"padding-left:7px; padding-top:5px\"><div class=\"heroimage\" style=\"background: url(images/heros.png) " + heroImageIndex[i].x * 60 + " " + heroImageIndex[i].y * 60  + "/360px 360px\"></div></td>");
+							document.write("<td>");
+							document.write("<table>");
+							document.write("<tr class=\"titanstext\"><td colspan=\"3\">" + heros[i].name + "</td></tr>");
+							document.write("<tr class=\"titanstext\"><td><div style=\"display: inline-block\">Lv. </div><input class=\"titanstext\" class=\"heroLevel\" style=\"margin-left: 6px; background-color:#555555; border:2px solid #CCCCCC; width: 50px;\" type=\"number\" id=\"hero" + i + "\" onchange=\"updateHeroLevel(" + i + ")\"></td>")
+							document.write("<td style=\"padding-left: 12px\">Weapon Upgrades <input class=\"titanstext\" style=\"background-color:#555555; width: 40px;\" type=\"number\" id=\"hero" + i + "upgrades\" onchange=\"updateHeroUpgrades(" + i + ")\"></td>")
+							document.write("</tr><tr class=\"titanstext\"><td colspan=\"2\">Skills ");
+							for(var j = 0; j < 7; j++)
+							{
+								document.write("<input class=\"heroSkill\", type=\"checkbox\" heroID=\"" + i + "\" id=\"hero" + i + "skill" + j + "\" title=\"" + skillTranslation[heros[i].skillType[j]] + 100*heros[i].skillValue[j] + "%\" onchange=\"updateSkillChecks(" + i + ", " + j + ")\">");
+							}
+							document.write("<td><div id=\"hero" + i + "skilltooltip\" style=\"display: inline-block; font-size: 65%\"></div></td></td></tr>")
+							document.write("</table>")
+							document.write("<td style=\"padding-right:20px\"><table style=\"width:200\">");
+							document.write("<tr><td class=\"titanstext\" id=\"hero" + i + "dps\" style=\"text-align: right\">Hero DPS: </td></tr>");
+							document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Next Level <img src=\"images\\gold.png\" height=\"11\" width=\"11\" style=\"padding-right: 2px\"><div id=\"hero" + i + "cost\" style=\"display: inline-block\">0</div></td></tr>");
+							document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Total Spent <img src=\"images\\gold.png\" height=\"11\" width=\"11\" style=\"padding-right: 2px\"><div id=\"hero" + i + "totalcost\" style=\"display: inline-block\">0</div></td></tr>");
+							document.write("</table></td>")
+							document.write("</tr>");
+							document.write("<tr class=\"spacing\"></tr>");
+						}
+					</script>
+					<td><input type="button" value="Reset Heros" onclick="resetHeros()">	
+				</table>
+		    </div>
 		</div>
-		<input id="load" type="button" value="Load" onclick="loadGameFromString()"/>
-		<input id="save" type="button" value="Save" onclick="saveGameToString()"/>
-	</form>
+	</div>
+	<!--<input id="maxstage" type="button" value="Maximize" onclick="findMaxStage()" />-->
+    <div align="center" style="height:49px;background-color:#000000" class="tabs-menu" padding="10">
+		<div class="current" id="btnherotab" href="#tab-1"></div>
+		<div id="btnartifactstab" href="#tab-2"></div>
+	</div>
 	<style>
 		#topbar
 		{
@@ -444,9 +607,11 @@
 			background-size: contain;
     		font-family: "Times New Roman", Times, serif;
     		font-weight: bold;
+    		font-size: 110%;
     		padding-left: 10px;
-    		padding-top: 10px;
+    		padding-top: 15px;
     		color: white;
+    		text-align: center
 		}
 		#btnherotab
 		{
@@ -454,7 +619,7 @@
 			width: 149;
 			height: 49;
 			background-image: url("/images/herosUp.png");
-			float: left;
+			display: inline-block
 		}
 		#btnherotab.current
 		{
@@ -462,7 +627,7 @@
 			width: 149;
 			height: 49;
 			background-image: url("/images/herosDown.png");
-			float: left;
+			display: inline-block
 		}
 		#btnartifactstab
 		{
@@ -470,7 +635,7 @@
 			width: 149;
 			height: 49;
 			background-image: url("/images/artifactsUp.png");
-			float: left;
+			display: inline-block
 		}
 		#btnartifactstab.current
 		{
@@ -478,8 +643,7 @@
 			width: 149;
 			height: 49;
 			background-image: url("/images/artifactsDown.png");
-    		overflow: visible;
-			float: left;
+			display: inline-block
 		}
 		.scrolltable
 		{
@@ -509,6 +673,8 @@
 		}
 		.heroRow > td:last-of-type
 		{
+			width: 200px;
+			text-align:right;
 			background-image: url("images/heroRowRight.png");
     		background-position: right; 
 			background-repeat: no-repeat;
@@ -562,10 +728,22 @@
     		opacity: 1;
    			transition: opacity 1s ease-in-out;
 		}
+		body {
+			background: url('images/background.png');
+			margin: 0px;
+			padding: 0px;
+			border-left: 150px;
+			border-right: 150px;
+			border-bottom: 0px;
+			border-top: 0px;
+			overflow-x: hidden; /* For Opera */
+    		border-image: url('images/border.png') 50 50 round;
+		}
 	</style>
 	<script>
 		loadCookie();
 	</script>
+</body>
 </html>
 
 <style>
@@ -582,7 +760,14 @@
 	$(document).ready(function() {
 		updateHeroLevel();
 		updateArtifacts();
-
+		
+		$(".heroSkill_").hover(function() {
+		    var heroID = $(this).attr("heroID");
+		    setText("hero" + heroID + "skilltooltip", $(this).attr("title"));
+		    }, function(){
+		    var heroID = $(this).attr("heroID");
+		    setText("hero" + heroID + "skilltooltip", "");
+		});
 
 		$(".tabs-menu div").click(function(event) {
 			console.log("click");
@@ -726,6 +911,16 @@
 		updateTitans();
 	}
 
+	function getTotalHeroSpent(heroID)
+	{
+		return heros[heroID].cost * (1 - Math.pow(1.075, heros[heroID].level))/(1- 1.075);
+	}
+
+	function getHeroCost(heroID, level)
+	{
+		return heros[heroID].cost * Math.pow(1.075, level - 1);
+	}
+
 	function updateHeroLevel()
 	{
 		heroSkills = {
@@ -743,6 +938,8 @@
 		{
 			var hlabel = "#hero" + i;
 			heros[i].level = $(hlabel).val();
+
+			var nextCost = getHeroCost(i, +(heros[i].level) + 1);
 			for(var j = 0; j < 7; j++)
 			{
 				var skillEnabled = $(hlabel + "skill" + j).prop('checked');
@@ -752,6 +949,8 @@
 					heroSkills[heros[i].skillType[j]] += heros[i].skillValue[j];
 				}
 			}
+			setText("hero" + i + "cost", formatNumber(nextCost));
+			setText("hero" + i + "totalcost", formatNumber(getTotalHeroSpent(i)));
 		}
 
 		updateTitans();
@@ -768,6 +967,7 @@
 			for(var j = 0; j < 7; j++)
 			{
 				var skillEnabled = $(hlabel + "skill" + j).prop('checked', false);
+				heros[i].skillBought[j] = false;
 				heroSkills[heros[i].skillType[j]] = 0;
 			}
 		}
@@ -778,6 +978,9 @@
 	function updateStage()
 	{
 		stageValues.stage = $("#stage").val();
+		if(stageValues.stage > 4000)
+			stageValues.stage = 4000;
+
 		var baseHealth = 18.5 * Math.pow(1.57, Math.min(stageValues.stage, 156)) * Math.pow(1.17, Math.max(stageValues.stage - 156, 0));
 		var baseGold = baseHealth * (0.02 + (0.00045 * Math.min(stageValues.stage, 150)));
 
@@ -984,25 +1187,25 @@
 	{
 		var stageGold = 10 * stageValues.chestChance * stageValues.chestGold + 10 * (1 - stageValues.chestChance) * stageValues.mobGold + stageValues.bossGold;
 
-		if(heroSkills["goldAmount"] > 0)
-			setText("tgoldmultiplier", "Gold Multiplier: " + Math.round(heroSkills["goldAmount"]*100) + "%");
-		setText("tstage", "Stage: " + stageValues.stage);
-		setText("tmobhealth", "Mob Health: " + formatNumber(stageValues.mobHealth));
-		setText("tbosshealth", "Boss Health: " + formatNumber(stageValues.bossHealth));
-		setText("tmobgold", "Mob Gold: " + formatNumber(stageValues.mobGold));
-		setText("tbossgold", "Boss Gold: " + formatNumber(stageValues.bossGold));
-		setText("tchestersonchance", "Chesterson Chance: " + stageValues.chestChance);
-		setText("tchestersongold", "Chesterson Gold: " + formatNumber(stageValues.chestGold));
-		setText("tstagegold", "Stage Gold: " + formatNumber(stageGold));
-		setText("tartifcatmultiplier", "Artifact Damage: " + Math.round(amuletDamage * 100) + "%");
-		setText("talldamage", "Hero All Damage: " + Math.round(heroSkills["allDamage"] * 100) + "%");
-		setText("therodps", "Hero DPS: " + formatNumber(gameValues.heroDamage));
-		setText("ttapdamage", "Tap Damage: " + formatNumber(gameValues.tapDamage));
-		setText("tcriticalmultiplier", "Critical Multiplier: " + gameValues.criticalMultiplier.toFixed(2));
-		setText("tcriticaldamage", "Critical Damage: " + formatNumber(gameValues.criticalDamage));
-		setText("tcriticalchance", "Critical Chance: " + gameValues.criticalChance*100 + "%");
-		setText("ttapdps", "Tap DPS (at 7 tps): " + formatNumber(gameValues.tapDPS));
-		setText("tsecondstokillboss", "Seconds to Kill Boss:" + (stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))).toFixed(2));
+		//if(heroSkills["goldAmount"] > 0)
+		//	setText("tgoldmultiplier", "Gold Multiplier: " + Math.round(heroSkills["goldAmount"]*100) + "%");
+		setText("tmobhealth", formatNumber(stageValues.mobHealth));
+		setText("tbosshealth", formatNumber(stageValues.bossHealth));
+		setText("tmobgold", formatNumber(stageValues.mobGold));
+		setText("tbossgold", formatNumber(stageValues.bossGold));
+		setText("tchestchance", Math.round(100*stageValues.chestChance) + "%");
+		setText("tchestgold", formatNumber(stageValues.chestGold));
+		setText("tstagegold", formatNumber(stageGold));
+		setText("tartifcatmultiplier", Math.round(amuletDamage * 100) + "%");
+		//setText("talldamage", "Hero All Damage: " + Math.round(heroSkills["allDamage"] * 100) + "%");
+		setText("therodps", formatNumber(gameValues.heroDamage));
+		setText("therodpsbar", formatNumber(gameValues.heroDamage));
+		setText("ttapdamage", formatNumber(gameValues.tapDamage));
+		//setText("tcriticalmultiplier", "Critical Multiplier: " + gameValues.criticalMultiplier.toFixed(2));
+		setText("tcriticaldamage", formatNumber(gameValues.criticalDamage));
+		setText("tcriticalchance", Math.round(gameValues.criticalChance*100) + "%");
+		setText("ttapdps", formatNumber(gameValues.tapDPS));
+		setText("tsecondstokillboss", (stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))).toPrecision(2));
 	}
 	
 	function setText(name, text)
