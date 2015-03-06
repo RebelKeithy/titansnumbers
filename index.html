@@ -8,6 +8,69 @@
 			var bossMultiplier = [2, 4, 6, 7, 10];
 			var skillAtLevel = [10, 25, 50, 100, 200, 400, 800];
 
+			var heroImageIndex = [
+				{x:0, y:1},
+				{x:0, y:2},
+				{x:0, y:4},
+				{x:0, y:3},
+				{x:4, y:1},
+				{x:2, y:1},
+				{x:0, y:5},
+				{x:5, y:1},
+				{x:3, y:1},
+				{x:0, y:0},
+				{x:4, y:5},
+				{x:4, y:2},
+				{x:2, y:3},
+				{x:4, y:4},
+				{x:5, y:2},
+				{x:5, y:0},
+				{x:5, y:4},
+				{x:2, y:2},
+				{x:4, y:0},
+				{x:1, y:1},
+				{x:5, y:3},
+				{x:1, y:2},
+				{x:3, y:3},
+				{x:5, y:5},
+				{x:4, y:3},
+				{x:3, y:2},
+				{x:3, y:4},
+				{x:3, y:5},
+				{x:1, y:3},
+				{x:3, y:0}
+			]
+			var amuletImageIndex = {
+				valrunes: {x:3, y:3},
+				resolution: {x:0, y:3},
+				mettle: {x:1, y:6},
+				savior: {x:3, y:4},
+				contentment: {x: 0, y:6},
+				elixir: {x: 3, y: 5},
+				egg: {x: 1, y: 3},
+				cloak: {x:0, y:4},
+				seeker: {x:2, y:4},
+				chalice: {x:1, y:7},
+				hammer: {x:2, y:6},
+				fortune: {x:0, y:0},
+				ointment: {x: 1, y:0},
+				thrust: {x:2, y:5},
+				pendant: {x:1, y:2},
+				gauntlet: {x:2, y:2},
+				armor: {x:3, y:7},
+				lotion: {x:2, y:3},
+				parchment: {x:2, y:7},
+				opulence: {x:3, y:0},
+				charm: {x:1, y:5},
+				scroll: {x:3, y:6},
+				saintly: {x:0, y:2},
+				tincture: {x:0, y:1},
+				fissure: {x:2, y:1},
+				aura: {x:0, y:5},
+				revival: {x:0, y:7},
+				worldly: {x:1, y:4},
+				shield: {x:3, y:2}
+			}
 			var stageValues = {
 				stage: 1,
 				mobHealth: 30,
@@ -26,6 +89,7 @@
 				tapDamage: 1,
 				tapDPS: 7,
 				heroDamage: 0,
+				upgradeSets: 0,
 				heavenlyStrike: 0,
 				shadowClone: 0,
 				criticalStrike: 0,
@@ -44,7 +108,7 @@
 				tapDPS: 0
 			}
 			
-			// cost field is never used and should be remove
+			// dps field is never used and should be remove
 			var heros = [
 				{name:"Takeda the Blade Assassin", level:"0", upgrades:"0", dps:4, cost:"50", skillType:["heroDamage", "heroDamage", "allDamage", "criticalDamage", "heroDamage", "allDamage", "heroDamage"], skillValue:[0.5, 1, 0.1, 0.1, 10, 0.25, 100], skillBought:[false, false, false, false, false, false, false]},
 				{name:"Contessa the Torch Wielder", level:"0", upgrades:"0", dps:16, cost:"175", skillType:["tapDamage", "heroDamage", "heroDamage", "tapDPS", "allDamage", "goldAmount", "heroDamage"], skillValue:[0.05, 1, 10, 0.004, 0.1, 0.1, 100], skillBought:[false, false, false, false, false, false, false]},
@@ -78,35 +142,36 @@
 				{name:"Jaqulin the Unknown", level:"0", upgrades:"0", dps:391.16E+9, cost:"3.76E+111", skillType:["criticalDamage", "tapDamage", "tapDPS", "goldAmound", "allDamage", "allDamage", "allDamage"], skillValue:[0.4, 0.2, 0.01, 0.6, 0.2, 0.3, 0.4], skillBought:[false, false, false, false, false, false, false]}
 			];
 			var amulets = {
-				"valrunes": {name:"Amulet of the Valrunes", level:"0", maxLevel:-1, baseDamage:0.5, incrementDamage:0.25}, // Implemented
-				"resolution": {name:"Axe of Resolution", level:"0", maxLevel: -1, baseDamage:0.7, incrementDamage:0.35},
-				"mettle": {name:"Barbarian's Mettle", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
-				"contentment": {name:"Chest of Contentment", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},  // implemented
-				"elixir": {name:"Crafter's Elixir", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},	// implemented
-				"egg": {name:"Crown Egg", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},	// implemented 
-				"cloak": {name:"Dark Cloak of Life", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
-				"seeker": {name:"Death Seeker", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
-				"chalice": {name:"Divine Chalice", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
-				"hammer": {name:"Drunken Hammer", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2},
-				"fortune": {name:"Future's Fortune", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
-				"ointment": {name:"Hunter's Ointment", level:"0", maxLevel:10, baseDamage:1.2, incrementDamage:0.6},
-				"thrust": {name:"Hero's Thrust", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
-				"shield": {name:"Knight's Shield", level:"0", maxLevel:-1, baseDamage:0.6, incrementDamage:0.3},
-				"pendant": {name:"Laborer's Pendant", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
-				"gauntlet": {name:"Ogre's Gauntlet", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
-				"armor": {name:"Otherworldly Armor", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
-				"lotion": {name:"Overseer's Lotion", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
-				"parchment": {name:"Parchment of Importance", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
-				"opulence": {name:"Ring of Opulence", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
-				"charm": {name:"Ring of Wonderous Charm", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
-				"scroll": {name:"Sacred Scroll", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
-				"saintly": {name:"Saintly Shield", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35},
-				"savior": {name:"Savior Shield", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15},
-				"tincture": {name:"Tincture of the Maker", level:"0", maxLevel:-1, baseDamage:0.1, incrementDamage:0.05},
-				"fissure": {name:"Universal Fissure", level:"0", maxLevel:-1, baseDamage:1.2, incrementDamage:0.6},
-				"aura": {name:"Undead Aura", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15},
-				"revival": {name:"Warrior's Revival", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35},
-				"worldly": {name:"Worldly Illuminator", level:"0", maxLevel:5, baseDamage:3, incrementDamage:1.5}
+				"savior": {name:"Savior Shield", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15, costX:0.5, costY:1.7},
+				"fissure": {name:"Universal Fissure", level:"0", maxLevel:-1, baseDamage:1.2, incrementDamage:0.6, costX:0.5, costY:1.7},
+				"tincture": {name:"Tincture of the Maker", level:"0", maxLevel:-1, baseDamage:0.1, incrementDamage:0.05, costX:0.6, costY:2.5},
+				"valrunes": {name:"Amulet of the Valrunes", level:"0", maxLevel:-1, baseDamage:0.5, incrementDamage:0.25, costX:0.7, costY:2}, // Implemented
+				"hammer": {name:"Drunken Hammer", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2, costX:0.5, costY:1.7},
+				"chalice": {name:"Divine Chalice", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15, costX:0.7, costY:1.7},
+				"pendant": {name:"Laborer's Pendant", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35, costX:0.7, costY:1.5},
+				"seeker": {name:"Death Seeker", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15, costX:0.5, costY:2, costX:0.5, costY:2},
+				"thrust": {name:"Hero's Thrust", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15, costX:0.7, costY:1.7},
+				"fortune": {name:"Future's Fortune", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15, costX:0.7, costY:2},
+				"opulence": {name:"Ring of Opulence", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35, costX:0.7, costY:1.7},
+				"mettle": {name:"Barbarian's Mettle", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35, costX:0.4, costY:1.5},
+				"lotion": {name:"Overseer's Lotion", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35, costX:0.4, costY:1.5},
+				"elixir": {name:"Crafter's Elixir", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2, costX:0.5, costY:1.8},	// implemented
+				"resolution": {name:"Axe of Resolution", level:"0", maxLevel: -1, baseDamage:0.7, incrementDamage:0.35, costX:0.5, costY:1.7},
+				"aura": {name:"Undead Aura", level:"0", maxLevel:-1, baseDamage:0.3, incrementDamage:0.15, costX:0.7, costY:2},
+				"egg": {name:"Crown Egg", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2, costX:1, costY:1.5},	// implemented 
+				"parchment": {name:"Parchment of Importance", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35, costX:0.5, costY:1.7},
+				"cloak": {name:"Dark Cloak of Life", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15, costX:0.5, costY:2, costX:0.5, costY:2},
+				"shield": {name:"Knight's Shield", level:"0", maxLevel:-1, baseDamage:0.6, incrementDamage:0.3, costX:0.7, costY:1.5},
+
+				"contentment": {name:"Chest of Contentment", level:"0", maxLevel:-1, baseDamage:0.4, incrementDamage:0.2, costX:1, costY:1.5},  // implemented
+				"ointment": {name:"Hunter's Ointment", level:"0", maxLevel:10, baseDamage:1.2, incrementDamage:0.6, costX:0.4, costY:1.5},
+				"gauntlet": {name:"Ogre's Gauntlet", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35, costX:0.5, costY:1.7},
+				"armor": {name:"Otherworldly Armor", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35, costX:1, costY:2.2},
+				"charm": {name:"Ring of Wonderous Charm", level:"0", maxLevel:25, baseDamage:0.3, incrementDamage:0.15, costX:0.5, costY:1.7},
+				"scroll": {name:"Sacred Scroll", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35, costX:0.4, costY:1.5},
+				"saintly": {name:"Saintly Shield", level:"0", maxLevel:10, baseDamage:0.7, incrementDamage:0.35, costX:0.3, costY:1.5},
+				"revival": {name:"Warrior's Revival", level:"0", maxLevel:-1, baseDamage:0.7, incrementDamage:0.35, costX:1, costY:2.2},
+				"worldly": {name:"Worldly Illuminator", level:"0", maxLevel:5, baseDamage:3, incrementDamage:1.5, costX:0.6, costY:3}
 			};
 
 			function loadGameFromString()
@@ -140,6 +205,8 @@
 						else
 							saveString += "0";
 					}
+
+					saveString += "!" + heros[i].upgrades;
 				}
 
 				for(var name in amulets)
@@ -159,7 +226,6 @@
 
 				for(var i = 0; i < heros.length; i++)
 				{
-					console.log("loading hero " + i + " " + splitSaveString[2 + i]);
 					var heroString = splitSaveString[2 + i].split("!");
 					heros[i].level = heroString[0];
 
@@ -181,14 +247,19 @@
 							heros[i].skillBought[j] = false;
 						}
 					}
+
+					if(heroString[2] > 0)
+						heros[i].upgrades = heroString[2];
+					else
+						heros[i].upgrades = 0;
+
+					$("#hero" + i + "upgrades").val(heros[i].upgrades);
 				}
 
-				console.log("loading amulets... " + amulets.length);
 				for(var i = 0; i < 29; i++)
 				{
 					var amuletName = splitSaveString[32 + i * 2];
 					var level = splitSaveString[33 + i * 2];
-					console.log("loading amulet " + amuletName + " " + level);
 					if(level > 0)
 					{
 						amulets[amuletName].level = level;
@@ -211,6 +282,7 @@
 						else
 							cookie += "0";
 					}
+					cookie += "!" + heros[i].upgrades;
 					$.cookie("hero" + i, cookie);
 				}
 
@@ -247,6 +319,11 @@
 							heros[i].skillBought[j] = false;
 						}
 					}
+					if(cookie[2] > 0)
+						heros[i].upgrades = cookie[2];
+					else
+						heros[i].upgrades = 0;
+					$("#hero" + i + "upgrades").val(heros[i].upgrades);
 				}
 
 				for(var name in amulets)
@@ -277,77 +354,213 @@
 	<p id="tstagegold">Stage Gold: 0<p>
 	<p id="tartifcatmultiplier">Artifact Damage: 0"</p>
 	<p id="talldamage">Hero All Damage: 0</p>
-	<p id="therodps">Hero DPS: 0</p>
 	<p id="ttapdamage">Tap Damage: 0</p>
 	<p id="tcriticalmultiplier">Critical Multiplier: 10</p>
 	<p id="tcriticaldamage">Critical Damage: 0</p>
 	<p id="tcriticalchance">Critical Chance: 2%</p>
-	<p id="ttapdps">Tap DPS (at 10 tps): 0</p>
 	<p id="tsecondstokillboss">Seconds to Kill Boss: 0 </p>
 
 	<br>
 	<h2><p>Enter information from your game.</p></h2>
 	<form id="form" name="form">
 		<p>Stage: <input type="number" id="stage" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></p>
-		<p>Hero: <input type="number" id="taphero" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></p>
-		<table>
-			<tr>
-				<td valign="top">
-					<h3>Artifacts</h3>
-					<div style="height:300px;overflow:auto;">
-						<table id="artifacts">
-							<script>
-								for(var key in amulets)
+		<p>Hero: <input type="number" id="taphero" value="1" onkeyup="updateTitans()" onchange="updateTitans()"/></p><div id="tabs-container">
+	    
+	    <div id="topbar"><div id="therodps" style="display:inline" >Hero DPS: 0</div><div style="display:inline;padding-left:20px" id="ttapdps">Tap DPS: 0</div></div>
+	    <div class="tab" style="background-color:#000000">
+	        <div id="tab-2" class="tab-content">
+
+				<div style="height:300px;overflow:auto;background-color:#161616">
+					<table cellspacing="0" id="artifacts" style="padding-left: 6px">
+						<script>
+							for(var key in amulets)
+							{
+								document.write("<tr class=\"spacing\"></tr>");
+								document.write("<tr class=\"artifactRow\" style=\"height:92px; padding-right:20px\">");
+								document.write("<td align=\"center\" style=\"padding-left:7px; padding-top:3px\"><div class=\"artifactimage\" style=\"background: url(images/artifacts.png) " + amuletImageIndex[key].x * 64 + " " + amuletImageIndex[key].y * 64 + "/256px 512px\"></div></td>");
+								document.write("<td><table style=\"width:275\">");
+								document.write("<tr><td class=\"titanstext\">" + amulets[key].name + "</td></tr>");
+								document.write("<tr><td class=\"titanstext\" id=\"" + key + "bonus\">+0%</td></tr>");
+								document.write("<tr><td class=\"titanstext\" id=\"" + key + "damage\">+0% All Damage</td></tr>");
+								document.write("</table></td>");
+								document.write("<td style=\"padding-right:20px\"><table style=\"width:200\">");
+								document.write("<tr><td class=\"titanstext\" style=\"padding-right: 0px; text-align: right\">Lv.<input class=\"titanstext\" style=\"width: 50px; margin-left:6px; background-color:#555555; border:2px solid #CCCCCC\" type=\"number\" id=\"" + key + "\" value=\"0\" onchange=\"updateArtifacts()\"></td></tr>");
+								document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Next Level <img src=\"images\\relic.png\" height=\"11\" width=\"13\"> <div id=\"" + key + "nextlevel\" style=\"display: inline-block\">0</div></td></tr>");
+								document.write("<tr><td class=\"titanstext\" style=\"text-align: right\">Total Spent <img src=\"images\\relic.png\" height=\"11\" width=\"13\"> <div id=\"" + key + "totalspent\"  style=\"display: inline-block\">0</td></tr>");
+								document.write("</table></td>");
+								document.write("</tr>");
+							}
+						</script>
+						<td><input type="button" value="Reset Artifacts" onclick="resetArtifacts()">	
+					</table><br>
+				</div>
+			</div>
+
+	        <div id="tab-1" class="tab-content">
+
+				<div style="height:300px;overflow:auto;background-color:#161616">
+					<table cellspacing="0" id="heros" style="padding-left: 6px">
+						<script>
+							document.write("<tr class=\"spacing\"></tr>");
+							for(var i = 0; i < heros.length; i++)
+							{
+								document.write("<tr class=\"heroRow\" style=\"height:92px;\">");
+								document.write("<td align=\"center\" style=\"padding-left:7px; padding-top:5px\"><div class=\"heroimage\" style=\"background: url(images/heros.png) " + heroImageIndex[i].x * 60 + " " + heroImageIndex[i].y * 60  + "/360px 360px\"></div></td>");
+								document.write("<td>");
+								document.write("<table>");
+								document.write("<tr class=\"titanstext\"><td colspan=\"3\">" + heros[i].name + "</td></tr>");
+								document.write("<tr class=\"titanstext\"><td><div style=\"display: inline-block\">Lv. </div><input class=\"titanstext\" class=\"heroLevel\" style=\"margin-left: 6px; background-color:#555555; border:2px solid #CCCCCC; width: 50px;\" type=\"number\" id=\"hero" + i + "\" onchange=\"updateHeroLevel(" + i + ")\"></td>")
+								document.write("<td>Weapon Upgrades <input class=\"titanstext\" style=\"background-color:#555555; width: 40px;\" type=\"number\" id=\"hero" + i + "upgrades\" onchange=\"updateHeroUpgrades(" + i + ")\"></td>")
+								document.write("</tr><tr class=\"titanstext\"><td>Skills ");
+								for(var j = 0; j < 7; j++)
 								{
-									document.write("<tr>");
-									document.write("<td>" + amulets[key].name + "</td>");
-									document.write("<td><input style=\"width: 50px;\" type=\"number\" id=\"" + key + "\" value=\"0\" onchange=\"updateArtifacts()\"></td>");
-									document.write("<td id=\"" + key + "damage" + "\">0%</td>");
-									document.write("</tr>");
+									document.write("<input class=\"heroSkill\", type=\"checkbox\" id=\"hero" + i + "skill" + j + "\" onchange=\"updateSkillChecks(" + i + ", " + j + ")\">");
 								}
-							</script>
-							<td><input type="button" value="Reset Artifacts" onclick="resetArtifacts()">	
-						</table><br>
-					</div>
-				</td>
-				<td valign="top">
-					<h3>Heros</h3>
-					<div style="height:300px;width:520px;overflow:auto;">
-						<table id="heros">
-							<tr>
-								<td>Name</td>
-								<td>Level</td>
-								<td>Skills</td>
-							</tr>
-							<script>
-								for(var i = 0; i < heros.length; i++)
-								{
-									document.write("<tr>");
-									document.write("<td>" + heros[i].name + "</td>");
-									document.write("<td><input style=\"width: 50px;\" type=\"number\" id=\"hero" + i + "\" onchange=\"updateHeroLevel()\">")
-									for(var j = 0; j < 7; j++)
-									{
-										document.write("<input class=\"shadow\", type=\"checkbox\" id=\"hero" + i + "skill" + j + "\" onchange=\"updateSkillChecks(" + i + ", " + j + ")\">");
-									}
-									document.write("</td><td id=\"hero" + i + "dps\">Hero DPS: </td>");
-									document.write("</tr>");
-								}
-							</script>
-							<td><input type="button" value="Reset Heros" onclick="resetHeros()">	
-						</table>
-					</div>
-				</td>
-			</tr>
-		</table>
+								document.write("</td></tr>")
+								document.write("</table>")
+								document.write("<td class=\"titanstext\" id=\"hero" + i + "dps\" style=\"padding-right: 20px; text-align: center\">Hero DPS: </td>");
+								document.write("</tr>");
+								document.write("<tr class=\"spacing\"></tr>");
+							}
+						</script>
+						<td><input type="button" value="Reset Heros" onclick="resetHeros()">	
+					</table>
+			    </div>
+			</div>
+		</div>
 		<!--<input id="maxstage" type="button" value="Maximize" onclick="findMaxStage()" />-->
+	    <div style="height:49px;background-color:#000000" class="tabs-menu" padding="10">
+			<div id="btnherotab" href="#tab-1"></div>
+			<div id="btnartifactstab" href="#tab-2"></div>
+		</div>
 		<input id="load" type="button" value="Load" onclick="loadGameFromString()"/>
 		<input id="save" type="button" value="Save" onclick="saveGameToString()"/>
 	</form>
 	<style>
+		#topbar
+		{
+			height: 30px;
+			background-image: url("/images/topBar.png");
+			background-size: contain;
+    		font-family: "Times New Roman", Times, serif;
+    		font-weight: bold;
+    		padding-left: 10px;
+    		padding-top: 10px;
+    		color: white;
+		}
+		#btnherotab
+		{
+			margin-left: 10px;
+			width: 149;
+			height: 49;
+			background-image: url("/images/herosUp.png");
+			float: left;
+		}
+		#btnherotab.current
+		{
+			margin-left: 10px;
+			width: 149;
+			height: 49;
+			background-image: url("/images/herosDown.png");
+			float: left;
+		}
+		#btnartifactstab
+		{
+			margin-left: 10px;
+			width: 149;
+			height: 49;
+			background-image: url("/images/artifactsUp.png");
+			float: left;
+		}
+		#btnartifactstab.current
+		{
+			margin-left: 10px;
+			width: 149;
+			height: 49;
+			background-image: url("/images/artifactsDown.png");
+    		overflow: visible;
+			float: left;
+		}
 		.scrolltable
 		{
 			height: 150px;
 			overflow: scroll;
+		}
+		.spacing
+		{
+			height: 12px;
+		}
+		.heroRow > td:first-of-type
+		{
+			background-image: url("images/heroRowLeft.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			width: 82px;
+		}
+		.heroRow > td
+		{
+			background-image: url("images/heroRowMid2.png");
+			background-repeat: none;
+			background-size: 100% 100%;
+    		font-family: "Times New Roman", Times, serif;
+    		font-style: bold;
+    		color: white;
+		}
+		.heroRow > td:last-of-type
+		{
+			background-image: url("images/heroRowRight.png");
+    		background-position: right; 
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+		.artifactRow > td:first-of-type
+		{
+			background-image: url("images/heroRowLeft.png");
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			display:inline-block;
+			width: 82px;
+		}
+		.artifactRow > td
+		{
+			background-image: url("images/heroRowMid2.png");
+			background-repeat: none;
+			background-size: 100% 100%;
+    		font-family: "Times New Roman", Times, serif;
+    		font-style: bold;
+    		color: white;
+		}
+		.artifactRow > td:last-of-type
+		{
+			background-image: url("images/heroRowRight.png");
+    		background-position: right; 
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+		.artifactimage
+		{
+			width:64;
+			height:64;
+		    margin-left: auto;
+		    margin-right: auto;
+		}
+		.heroimage
+		{
+			width:60;
+			height:60;
+		}
+		.titanstext
+		{
+    		font-family: "Arial", Arial, serif;
+    		font-weight: bold;
+    		color: white;
+		}
+		#tab-2-fade
+		{
+  			background:#000;
+    		opacity: 1;
+   			transition: opacity 1s ease-in-out;
 		}
 	</style>
 	<script>
@@ -355,51 +568,31 @@
 	</script>
 </html>
 
+<style>
+	.tab-content {
+	    display: none;
+	}
+
+	#tab-1 {
+	 display: block;   
+	}
+</style>
+
 <script>
-	$(function() {
+	$(document).ready(function() {
 		updateHeroLevel();
 		updateArtifacts();
 
-		$("#submit").click(function() {
-				for(var i = 0; i < heros.length; i++)
-				{
-					heros[i].level = 0;
-					$("#hero" + i).val(0);
 
-					for(var j = 0; j < 7; j++)
-					{
-						$("#hero" + i + "skill" + j).prop('checked', false);
-					}
-				}
-		});
-		
-		$("#hideartifacts").click(function() {
-			var table = document.getElementById("artifacts");
-			if($("#artifacts").hasClass("hidden"))
-			{
-				table.style.display = "table";
-				$("#artifacts").removeClass("hidden");
-			}
-			else
-			{
-				table.style.display = "none";
-				$("#artifacts").addClass("hidden");
-			}
-		});
-		
-		$("#hideheros").click(function() {
-			var table = document.getElementById("heros");
-			if($("#heros").hasClass("hidden"))
-			{
-				table.style.display = "table";
-				$("#heros").removeClass("hidden");
-			}
-			else
-			{
-				table.style.display = "none";
-				$("#heros").addClass("hidden");
-			}
-		});
+		$(".tabs-menu div").click(function(event) {
+			console.log("click");
+	        event.preventDefault();
+	        $(this).addClass("current");
+	        $(this).siblings().removeClass("current");
+	        var tab = $(this).attr("href");
+	        $(".tab-content").not(tab).css("display", "none");
+	        $(tab).fadeIn();
+	    });
 	});
 </script>
 
@@ -503,7 +696,6 @@
 	{
 		var baseCost = heros[heroID-1].cost;
 		var evolved = level > 1000;
-		console.log(level + " " + evolved);
 
 		var A = baseCost * (evolved ? 10 : 1) * Math.pow(1.075, level - 1);
 		var B = Math.pow(1.075, evolved ? level - 1000 : level) - 1;
@@ -516,6 +708,22 @@
 		//return baseCost * (evolved ? 10 : 1) * A * B * C * 0.1/0.075;
 
 		//return baseCost * (evolved ? 10 : 1) * Math.pow(1.075, level-1) * (Math.pow(1.075,(evolved ? level - 1000 : level)) - 1)  * (Math.pow(0.904, level-(evolved ? 1001 : 1)) * (Math.pow(1 - (0.019 * (Math.min(heroID, 15))), heroID) + (evolved ? 30 : 0))) / (0.075) * 0.1;
+	}
+
+	function updateHeroUpgrades(heroID)
+	{
+		var upgrades = $("#hero" + heroID + "upgrades").val();
+
+		heros[heroID].upgrades = +(upgrades);
+
+		var minUpgrades = upgrades;
+		for(var i = 0; i < heros.length; i++)
+		{
+			minUpgrades = Math.min(minUpgrades, heros[i].upgrades);
+		}
+		gameValues.upgradeSets = minUpgrades;
+
+		updateTitans();
 	}
 
 	function updateHeroLevel()
@@ -582,12 +790,104 @@
 		
 	}
 
+	function getArtifactBonus(artifact)
+	{
+		return 0;
+	}
+
+	function artifactCost(artifact, level)
+	{
+		return Math.round(amulets[artifact].costX * Math.pow(+(level)+1, amulets[artifact].costY));
+	}
+
+	function totalSpentOnArtifact(artifact)
+	{
+		var spent = 0;
+		for(var i = 0; i < amulets[artifact].level; i++)
+		{
+			spent += artifactCost(artifact, i);
+		}
+
+		return spent;
+	}
+
+	function artifactBonusString(name)
+	{
+		if(name == "savior")
+		{
+			return "+" + 10 * amulets[name].level + "% Boss Time";
+		}
+		if(name == "fissure")
+			return "+" + 10 * amulets[name].level + "% War Cry Duration";
+		if(name == "tincture")
+			return "+" + 5 * amulets[name].level + "% DPS";
+		if(name == "valrunes")
+			return "+" + 10 * amulets[name].level + "% Monster Gold";
+		if(name == "hammer")
+			return "+" + 10 * amulets[name].level + "% Tap Damage";
+		if(name == "chalice")
+			return "+" + 0.5 * amulets[name].level + "% Chance for 10x Gold";
+		if(name == "pendant")
+			return "-" + 5 * amulets[name].level + "% Hand of Midas Cool Down";
+		if(name == "seeker")
+			return "+" + 2 * amulets[name].level + "% Critical Chance";
+		if(name == "thrust")
+			return "+" + 20 * amulets[name].level + "% Critical Damage";
+		if(name == "fortune")
+			return "+" + 5 * amulets[name].level + "% Gold Collection";
+		if(name == "opulence")
+			return "+" + 10 * amulets[name].level + "% Hand of Midas Duration";
+		if(name == "mettle")
+			return "-" + 5 * amulets[name].level + "% Berserker Rage Cool Down";
+		if(name == "lotion")
+			return "-" + 5 * amulets[name].level + "% Shadow Clone Cool Down";
+		if(name == "elixir")
+			return "+" + 15 * amulets[name].level + "% Gold While Playing";
+		if(name == "resolution")
+			return "+" + 10 * amulets[name].level + "% Berserker Rage Duration";
+		if(name == "aura")
+			return "+" + 5 * amulets[name].level + "% Bonus Relic from Prestige";
+		if(name == "egg")
+			return "+" + 20 * amulets[name].level + "% Treasure Box Chance";
+		if(name == "parchment")
+			return "+" + 10 * amulets[name].level + "% Critical Strike Duration";
+		if(name == "cloak")
+			return "-" + 2 * amulets[name].level + "% Boss Life";
+		if(name == "shield")
+			return "+" + 100 * amulets[name].level + "% Boss Gold";
+		if(name == "contentment")
+			return "+" + 20 * amulets[name].level + "% Gold Treasure Box Chance";
+		if(name == "ointment")
+			return "-" + 5 * amulets[name].level + "% War Cry Cool Down";
+		if(name == "gauntlet")
+			return "+" + 10 * amulets[name].level + "% Shadow Clone Duration";
+		if(name == "charm")
+			return "-" + 2 * amulets[name].level + "% Upgrade Cost";
+		if(name == "scroll")
+			return "-" + 5 * amulets[name].level + "% Critical Strike Cool Down";
+		if(name == "saintly")
+			return "-" + 5 * amulets[name].level + "% Heavenly Strike Cool Down";
+		if(name == "revival")
+			return "-" + 5 * amulets[name].level + "% Revive Time";
+		if(name == "worldly")
+			return "-" + 100 * amulets[name].level + "% Monsters Each Stage";
+		if(name == "armor")
+			return "-" + 5 * amulets[name].level + "% Hero Death Chance";
+
+		return "+0%";
+	}
+
 	function updateArtifacts(name)
 	{
 		amuletDamage = 0;
 		for(var key in amulets)
 		{
 			amulets[key].level = $("#" + key).val();
+			if(amulets[key].level > amulets[key].maxLevel && amulets[key].maxLevel != -1)
+			{
+				amulets[key].level = amulets[key].maxLevel;
+				$("#" + key).val(amulets[key].maxLevel);
+			}
 		}
 
 		for(var key in amulets)
@@ -596,12 +896,20 @@
 			{
 				var currDamage = amulets[key].incrementDamage * (1 + +(amulets[key].level)) * (1 + 0.05 * amulets["tincture"].level);
 				amuletDamage += currDamage;
-				setText(key + "damage", Math.round(currDamage*100) + "%");
+				setText(key + "bonus", artifactBonusString(key));
+				setText(key + "damage", "+" + Math.round(currDamage*100) + "% All Damage");
+				
+				setText(key + "nextlevel", formatNumber(artifactCost(key, amulets[key].level)));
+				setText(key + "totalspent", formatNumber(totalSpentOnArtifact(key)));
 				//alert($("#" + key + "damage"))
 			}
 			else
 			{
-				setText(key + "damage", "0%");
+				setText(key + "bonus", artifactBonusString(key));
+				setText(key + "damage", "+0% All Damage");
+
+				setText(key + "nextlevel", "N/A");
+				setText(key + "totalspent", "0");
 			}
 		}
 		
@@ -648,12 +956,15 @@
 			}
 
 			heroDamage *= 1 + heroMultiplier;
+			heroDamage *= 1 + 0.5 * heros[i].upgrades;
+			if(+(gameValues.upgradeSets) > 0)
+				heroDamage *= 10 * gameValues.upgradeSets;
 			heroDamage *= 1 + amuletDamage;
 			gameValues.heroDamage += heroDamage;
 
 			gameValues.heroLevel = $("#taphero").val();
 
-			setText("hero" + i + "dps", formatNumber(heroDamage));
+			setText("hero" + i + "dps", "DPS: " + formatNumber(heroDamage));
 		}	
 
 		updateStage();
@@ -691,7 +1002,6 @@
 		setText("tcriticaldamage", "Critical Damage: " + formatNumber(gameValues.criticalDamage));
 		setText("tcriticalchance", "Critical Chance: " + gameValues.criticalChance*100 + "%");
 		setText("ttapdps", "Tap DPS (at 7 tps): " + formatNumber(gameValues.tapDPS));
-		console.log()
 		setText("tsecondstokillboss", "Seconds to Kill Boss:" + (stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))).toFixed(2));
 	}
 	
