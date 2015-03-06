@@ -442,7 +442,7 @@
 					</tr>
 					<tr class="spacing"></tr>
 					<tr class="redRow">
-						<td>Time to kill Boss</td>
+						<td>Seconds to kill Boss</td>
 						<td id="tsecondstokillboss">10</td>
 					</td>
 				</table>
@@ -459,7 +459,7 @@
 			display:inline-block;
 			padding-left: 10px;
 			height:45px;
-			width: 150px;
+			width: 160px;
 		}
 		.redRow > td:last-of-type
 		{
@@ -480,7 +480,7 @@
 			display:inline-block;
 			padding-left: 10px;
 			height:45px;
-			width: 150px;
+			width: 160px;
 		}
 		.greenRow > td:last-of-type
 		{
@@ -501,7 +501,7 @@
 			display:inline-block;
 			padding-left: 10px;
 			height:45px;
-			width: 150px;
+			width: 160px;
 		}
 		.goldRow > td:last-of-type
 		{
@@ -1207,7 +1207,7 @@
 		setText("tcriticaldamage", formatNumber(gameValues.criticalDamage));
 		setText("tcriticalchance", Math.round(gameValues.criticalChance*100) + "%");
 		setText("ttapdps", formatNumber(gameValues.tapDPS));
-		setText("tsecondstokillboss", (stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))).toPrecision(2));
+		setText("tsecondstokillboss", formatNumber(stageValues.bossHealth / ((gameValues.tapDPS + gameValues.heroDamage) * (1 + +(heroSkills["bossDamage"])))));
 	}
 	
 	function setText(name, text)
